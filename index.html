@@ -188,7 +188,7 @@
             backdrop-filter: blur(12px);
             border-radius: 24px 24px 0 0;
             padding: 16px 16px max(50px, env(safe-area-inset-bottom) + 40px);
-            max-height: 65dvh;
+            max-height: 80dvh;
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
             overscroll-behavior: contain;
@@ -1951,8 +1951,11 @@
         }
 
         // Prevent pull-to-refresh on mobile
+        // Prevent pull-to-refresh on mobile but allow scrolling in menu
         document.body.addEventListener('touchmove', function (e) {
             if (e.target.closest('#map')) return;
+            if (e.target.closest('.menu-panel')) return;
+            if (e.target.closest('.search-results')) return;
             e.preventDefault();
         }, { passive: false });
 
