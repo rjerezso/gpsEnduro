@@ -17,7 +17,7 @@
     <meta name="msapplication-tap-highlight" content="no">
 
     <!-- Manifest -->
-    <link rel="manifest" href="manifest.json">
+    <link rel="manifest" href="./manifest.json">
 
     <!-- Icons -->
     <link rel="icon" type="image/svg+xml"
@@ -177,62 +177,33 @@
             }
         }
 
-        /* MENÚ MÓVIL OPTIMIZADO */
+        /* MENÚ MÓVIL OPTIMIZADO - COMPACTO */
         .menu-panel {
             position: fixed;
-            bottom: 70px;
+            bottom: 0;
             left: 0;
             right: 0;
-            z-index: 1002;
+            z-index: 1000;
             background: rgba(17, 24, 39, 0.98);
             backdrop-filter: blur(12px);
-            border-radius: 24px 24px 0 0;
-            padding: 16px 16px max(50px, env(safe-area-inset-bottom) + 40px);
-            height: 80dvh;
-            overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
-            overscroll-behavior: contain;
-            touch-action: pan-y;
+            border-radius: 20px 20px 0 0;
+            padding: 8px 12px 16px;
+            padding-bottom: max(16px, env(safe-area-inset-bottom));
             border-top: 3px solid #f97316;
             box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.7);
             transition: transform 0.3s ease;
         }
 
-        /* Mobile adjustments */
-        @media (max-width: 768px) {
-
-            html,
-            body {
-                height: 100%;
-                overscroll-behavior: auto;
-                touch-action: auto;
-            }
-
-            .menu-panel {
-                overflow-y: scroll;
-                height: calc(100dvh - 70px);
-            }
-        }
-
         .menu-panel.collapsed {
-            transform: translateY(calc(100% - 70px));
+            transform: translateY(calc(100% - 50px));
         }
 
         .menu-handle {
-            width: 50px;
-            height: 5px;
+            width: 40px;
+            height: 4px;
             background: #4b5563;
-            border-radius: 3px;
-            margin: 0 auto 12px;
-        }
-
-        .menu-header {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding-bottom: 12px;
-            border-bottom: 1px solid #374151;
-            margin-bottom: 16px;
+            border-radius: 2px;
+            margin: 0 auto 8px;
         }
 
         /* NAVEGACIÓN MÓVIL */
@@ -354,21 +325,19 @@
         .search-input {
             width: 100%;
             background: #111827;
-            border: 2px solid #f97316;
-            border-radius: 12px;
-            padding: 16px 44px;
+            border: 2px solid #374151;
+            border-radius: 10px;
+            padding: 10px 32px;
             color: white;
-            font-size: 16px;
+            font-size: 14px;
             transition: all 0.2s;
-            box-shadow: 0 2px 8px rgba(249, 115, 22, 0.2);
             -webkit-appearance: none;
-            appearance: none;
         }
 
         .search-input:focus {
             outline: none;
-            border-color: #fbbf24;
-            box-shadow: 0 0 20px rgba(249, 115, 22, 0.5);
+            border-color: #f97316;
+            box-shadow: 0 0 10px rgba(249, 115, 22, 0.3);
         }
 
         .search-input::placeholder {
@@ -377,23 +346,22 @@
 
         .search-icon {
             position: absolute;
-            left: 16px;
+            left: 10px;
             top: 50%;
             transform: translateY(-50%);
-            color: #f97316;
             pointer-events: none;
-            font-size: 18px;
+            font-size: 12px;
         }
 
         .search-clear {
             position: absolute;
-            right: 12px;
+            right: 8px;
             top: 50%;
             transform: translateY(-50%);
             color: #9ca3af;
             cursor: pointer;
-            padding: 8px;
-            font-size: 18px;
+            padding: 4px;
+            font-size: 14px;
         }
 
         .search-clear:active {
@@ -409,16 +377,16 @@
             font-size: 18px;
         }
 
-        /* BOTONES MÓVIL */
+        /* BOTONES MÓVIL - COMPACTOS */
         .btn-mobile {
-            min-height: 52px;
-            font-size: 15px;
+            min-height: 40px;
+            font-size: 13px;
             font-weight: 600;
-            border-radius: 14px;
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
+            gap: 6px;
             transition: all 0.15s;
             -webkit-tap-highlight-color: transparent;
         }
@@ -431,13 +399,13 @@
         .btn-primary {
             background: linear-gradient(135deg, #f59e0b, #d97706);
             color: #111827;
-            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4);
+            box-shadow: 0 2px 10px rgba(245, 158, 11, 0.4);
         }
 
         .btn-success {
             background: linear-gradient(135deg, #22c55e, #16a34a);
             color: white;
-            box-shadow: 0 4px 15px rgba(34, 197, 94, 0.4);
+            box-shadow: 0 2px 10px rgba(34, 197, 94, 0.4);
         }
 
         .btn-danger {
@@ -453,23 +421,23 @@
         /* FAB BUTTONS */
         .fab-container {
             position: fixed;
-            right: 16px;
-            bottom: 90px;
+            right: 12px;
+            bottom: 220px;
             z-index: 999;
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 8px;
         }
 
         .fab {
-            width: 56px;
-            height: 56px;
+            width: 44px;
+            height: 44px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 22px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+            font-size: 18px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
             -webkit-tap-highlight-color: transparent;
         }
 
@@ -556,128 +524,95 @@
         <!-- Handle para arrastrar -->
         <div class="menu-handle" id="menuHandle"></div>
 
-        <!-- Header -->
-        <div class="menu-header">
-            <i class="fas fa-motorcycle text-3xl text-orange-500"></i>
-            <div class="flex-1">
-                <h1 class="text-xl font-bold text-white">Enduro Route</h1>
-                <p class="text-gray-400 text-xs">GPS Off-Road • Caminos de tierra</p>
-            </div>
-            <button id="toggleMenu" class="w-10 h-10 bg-gray-700 rounded-full flex items-center justify-center">
-                <i class="fas fa-chevron-down text-gray-300"></i>
+        <!-- Header compacto -->
+        <div class="flex items-center gap-2 mb-2">
+            <i class="fas fa-motorcycle text-2xl text-orange-500"></i>
+            <h1 class="text-lg font-bold text-white flex-1">Enduro Route</h1>
+            <button id="toggleMenu" class="w-8 h-8 bg-gray-700 rounded-full flex items-center justify-center">
+                <i class="fas fa-chevron-down text-gray-300 text-sm"></i>
             </button>
         </div>
 
         <div id="menuContent">
-            <!-- Campo de búsqueda ORIGEN -->
-            <div class="mb-4">
-                <div class="flex items-center gap-2 mb-2">
-                    <span
-                        class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center text-sm font-bold text-white shadow-lg">A</span>
-                    <span class="text-sm text-gray-300 font-semibold">Punto de Inicio</span>
-                </div>
+            <!-- Campos de búsqueda en grid -->
+            <div class="grid grid-cols-2 gap-2 mb-2">
+                <!-- ORIGEN -->
                 <div class="search-container">
-                    <i class="fas fa-search search-icon"></i>
-                    <input type="text" id="searchInputA" class="search-input" placeholder="Buscar origen..."
-                        autocomplete="off">
+                    <i class="fas fa-circle text-green-500 search-icon text-xs"></i>
+                    <input type="text" id="searchInputA" class="search-input text-sm py-2 pl-8 pr-8"
+                        placeholder="Origen..." autocomplete="off">
                     <i class="fas fa-times search-clear hidden" id="clearSearchA"></i>
                     <i class="fas fa-spinner fa-spin search-loading hidden" id="loadingA"></i>
                     <div class="search-results" id="resultsA"></div>
                 </div>
-            </div>
-
-            <!-- Campo de búsqueda DESTINO -->
-            <div class="mb-4">
-                <div class="flex items-center gap-2 mb-2">
-                    <span
-                        class="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center text-sm font-bold text-white shadow-lg">B</span>
-                    <span class="text-sm text-gray-300 font-semibold">Punto de Destino</span>
-                </div>
+                <!-- DESTINO -->
                 <div class="search-container">
-                    <i class="fas fa-search search-icon"></i>
-                    <input type="text" id="searchInputB" class="search-input" placeholder="Buscar destino..."
-                        autocomplete="off">
+                    <i class="fas fa-flag-checkered text-red-500 search-icon text-xs"></i>
+                    <input type="text" id="searchInputB" class="search-input text-sm py-2 pl-8 pr-8"
+                        placeholder="Destino..." autocomplete="off">
                     <i class="fas fa-times search-clear hidden" id="clearSearchB"></i>
                     <i class="fas fa-spinner fa-spin search-loading hidden" id="loadingB"></i>
                     <div class="search-results" id="resultsB"></div>
                 </div>
             </div>
 
-            <!-- Marcar en mapa -->
-            <div class="grid grid-cols-2 gap-3 mb-4">
-                <button id="btnSetA"
-                    class="btn-mobile btn-success ring-2 ring-white ring-offset-2 ring-offset-gray-900">
-                    <i class="fas fa-map-pin"></i>
-                    Marcar A
+            <!-- Marcar en mapa + Tipo ruta + Mapa en una fila -->
+            <div class="grid grid-cols-4 gap-2 mb-2">
+                <button id="btnSetA" class="btn-mobile btn-success py-2 text-xs ring-1 ring-white">
+                    <i class="fas fa-map-pin"></i> A
                 </button>
-                <button id="btnSetB" class="btn-mobile btn-danger">
-                    <i class="fas fa-flag-checkered"></i>
-                    Marcar B
+                <button id="btnSetB" class="btn-mobile btn-danger py-2 text-xs">
+                    <i class="fas fa-flag"></i> B
                 </button>
-            </div>
-
-            <!-- Tipo de ruta y mapa -->
-            <div class="grid grid-cols-2 gap-3 mb-4">
-                <div>
-                    <label class="text-xs text-gray-400 uppercase tracking-wider mb-2 block">Tipo Ruta</label>
-                    <div class="flex bg-gray-800 rounded-xl p-1">
-                        <button id="btnOffroad"
-                            class="flex-1 py-2.5 bg-orange-600 rounded-lg text-sm font-bold transition">
-                            <i class="fas fa-mountain"></i>
-                        </button>
-                        <button id="btnMixed"
-                            class="flex-1 py-2.5 rounded-lg text-sm font-bold transition text-gray-400">
-                            <i class="fas fa-road"></i>
-                        </button>
-                    </div>
+                <div class="flex bg-gray-800 rounded-lg p-0.5">
+                    <button id="btnOffroad" class="flex-1 py-2 bg-orange-600 rounded text-xs">
+                        <i class="fas fa-mountain"></i>
+                    </button>
+                    <button id="btnMixed" class="flex-1 py-2 rounded text-xs text-gray-400">
+                        <i class="fas fa-road"></i>
+                    </button>
                 </div>
-                <div>
-                    <label class="text-xs text-gray-400 uppercase tracking-wider mb-2 block">Mapa</label>
-                    <select id="mapType"
-                        class="w-full bg-gray-800 border-2 border-gray-600 rounded-xl px-3 py-2.5 text-sm font-medium focus:outline-none focus:border-orange-500">
-                        <option value="cyclosm" selected>🏍️ Caminos</option>
-                        <option value="mtb">🚵 MTB</option>
-                        <option value="topo">⛰️ Topo</option>
-                        <option value="hybrid">🛰️ Híbrido</option>
-                        <option value="satellite">🛰️ Satélite</option>
-                        <option value="street">🗺️ Calles</option>
-                    </select>
-                </div>
+                <select id="mapType"
+                    class="bg-gray-800 border border-gray-600 rounded-lg px-1 py-2 text-xs focus:outline-none">
+                    <option value="cyclosm">🏍️</option>
+                    <option value="mtb">🚵</option>
+                    <option value="topo">⛰️</option>
+                    <option value="satellite">🛰️</option>
+                </select>
             </div>
 
             <!-- Botón Calcular -->
-            <div class="flex gap-3 mb-4">
-                <button id="btnCalculate" class="flex-1 btn-mobile btn-primary">
-                    <i class="fas fa-route text-lg"></i>
+            <div class="flex gap-2 mb-2">
+                <button id="btnCalculate" class="flex-1 btn-mobile btn-primary py-3">
+                    <i class="fas fa-route"></i>
                     Calcular Ruta
                 </button>
-                <button id="btnClear" class="btn-mobile btn-secondary px-5" title="Limpiar">
+                <button id="btnClear" class="btn-mobile btn-secondary px-4 py-3">
                     <i class="fas fa-trash"></i>
                 </button>
             </div>
 
-            <!-- Route Info -->
+            <!-- Route Info - Compacto -->
             <div id="routeInfo" class="hidden">
-                <div class="grid grid-cols-3 gap-3 mb-4">
-                    <div class="info-card">
-                        <i class="fas fa-ruler"></i>
-                        <div class="value" id="distance">0 km</div>
-                        <div class="label">Distancia</div>
+                <div class="flex items-center gap-2 mb-2 bg-gray-800 rounded-xl p-2">
+                    <div class="flex-1 text-center">
+                        <div class="text-lg font-bold text-orange-400" id="distance">0 km</div>
+                        <div class="text-xs text-gray-400">Distancia</div>
                     </div>
-                    <div class="info-card">
-                        <i class="fas fa-clock"></i>
-                        <div class="value" id="duration">0 min</div>
-                        <div class="label">Tiempo</div>
+                    <div class="w-px h-8 bg-gray-600"></div>
+                    <div class="flex-1 text-center">
+                        <div class="text-lg font-bold text-white" id="duration">0 min</div>
+                        <div class="text-xs text-gray-400">Tiempo</div>
                     </div>
-                    <div class="info-card">
-                        <i class="fas fa-mountain"></i>
-                        <div class="value" id="elevation">0 m</div>
-                        <div class="label">Desnivel</div>
+                    <div class="w-px h-8 bg-gray-600"></div>
+                    <div class="flex-1 text-center">
+                        <div class="text-lg font-bold text-green-400" id="elevation">0 m</div>
+                        <div class="text-xs text-gray-400">Desnivel</div>
                     </div>
                 </div>
 
                 <!-- START NAVIGATION BUTTON -->
-                <button id="btnStartNav" class="w-full btn-mobile btn-success py-5 text-lg">
+                <button id="btnStartNav" class="w-full btn-mobile btn-success py-4 text-lg font-bold shadow-2xl">
                     <i class="fas fa-play text-xl"></i>
                     INICIAR NAVEGACIÓN
                 </button>
@@ -777,8 +712,8 @@
     <div id="loading" class="hidden fixed inset-0 bg-gray-900/80 z-[2000] flex items-center justify-center">
         <div class="text-center">
             <i class="fas fa-motorcycle text-6xl text-orange-500 animate-bounce mb-4"></i>
-            <p class="text-xl font-bold">Buscando caminos de tierra...</p>
-            <p class="text-gray-400">Evitando asfalto siempre que sea posible</p>
+            <p class="text-xl font-bold" id="loadingText">Buscando caminos de tierra...</p>
+            <p class="text-gray-400" id="loadingSubtext">Usando BRouter MTB - Evita asfalto</p>
         </div>
     </div>
 
@@ -1072,9 +1007,18 @@
 
             document.getElementById('loading').classList.remove('hidden');
 
+            // Actualizar texto de carga según modo
+            if (routeType === 'offroad') {
+                document.getElementById('loadingText').textContent = 'Buscando caminos de tierra...';
+                document.getElementById('loadingSubtext').textContent = 'Usando BRouter MTB - Evita asfalto';
+            } else {
+                document.getElementById('loadingText').textContent = 'Calculando ruta mixta...';
+                document.getElementById('loadingSubtext').textContent = 'Puede incluir carreteras asfaltadas';
+            }
+
             const startCoords = markerA.getLatLng();
             const endCoords = markerB.getLatLng();
-            const requestKey = `${startCoords.lat},${startCoords.lng}-${endCoords.lat},${endCoords.lng}`;
+            const requestKey = `${startCoords.lat},${startCoords.lng}-${endCoords.lat},${endCoords.lng}-${routeType}`;
 
             // Si es la misma ruta, mostrar la siguiente alternativa
             if (lastRouteRequest === requestKey && allRoutes.length > 1) {
@@ -1090,25 +1034,12 @@
             currentRouteIndex = 0;
 
             try {
-                // Pedir rutas alternativas a OSRM
-                const response = await fetch(
-                    `https://router.project-osrm.org/route/v1/driving/${startCoords.lng},${startCoords.lat};${endCoords.lng},${endCoords.lat}?overview=full&geometries=geojson&steps=true&alternatives=3`
-                );
-
-                if (!response.ok) throw new Error('Error en la API');
-
-                const data = await response.json();
-
-                if (data.routes && data.routes.length > 0) {
-                    allRoutes = data.routes;
-
-                    // Si solo hay una ruta, intentar generar alternativas con waypoints
-                    if (allRoutes.length === 1) {
-                        const extraRoutes = await generateAlternativeRoutes(startCoords, endCoords);
-                        allRoutes = [...allRoutes, ...extraRoutes];
-                    }
-
-                    displayRoute(allRoutes[0], 1, allRoutes.length);
+                if (routeType === 'offroad') {
+                    // Usar BRouter con perfil MTB para evitar asfalto
+                    await calculateOffroadRoute(startCoords, endCoords);
+                } else {
+                    // Modo mixto: usar OSRM normal
+                    await calculateMixedRoute(startCoords, endCoords);
                 }
             } catch (error) {
                 console.error('Error:', error);
@@ -1116,6 +1047,192 @@
             }
 
             document.getElementById('loading').classList.add('hidden');
+        }
+
+        // Calcular ruta OFF-ROAD usando BRouter (evita asfalto)
+        async function calculateOffroadRoute(startCoords, endCoords) {
+            // BRouter profiles para off-road: mtb, trekking, hiking
+            const profiles = ['mtb', 'trekking', 'hiking'];
+
+            for (const profile of profiles) {
+                try {
+                    // BRouter API
+                    const brouterUrl = `https://brouter.de/brouter?lonlats=${startCoords.lng},${startCoords.lat}|${endCoords.lng},${endCoords.lat}&profile=${profile}&alternativeidx=0&format=geojson`;
+
+                    const response = await fetch(brouterUrl);
+
+                    if (response.ok) {
+                        const data = await response.json();
+
+                        if (data.features && data.features.length > 0) {
+                            const feature = data.features[0];
+                            const coords = feature.geometry.coordinates;
+                            const properties = feature.properties;
+
+                            // Convertir a formato compatible
+                            const route = {
+                                geometry: feature.geometry,
+                                distance: properties['track-length'] || 0,
+                                duration: properties['total-time'] || 0,
+                                ascend: properties['filtered ascend'] || 0,
+                                descend: properties['filtered descend'] || 0,
+                                profile: profile,
+                                legs: [{
+                                    steps: generateStepsFromCoords(coords, properties.messages || [])
+                                }]
+                            };
+
+                            allRoutes.push(route);
+                        }
+                    }
+                } catch (e) {
+                    console.log(`Error con perfil ${profile}:`, e);
+                }
+            }
+
+            // También intentar rutas alternativas con waypoints
+            if (allRoutes.length < 3) {
+                try {
+                    const extraRoutes = await generateOffroadAlternatives(startCoords, endCoords);
+                    allRoutes = [...allRoutes, ...extraRoutes];
+                } catch (e) {
+                    console.log('Error generando alternativas:', e);
+                }
+            }
+
+            if (allRoutes.length > 0) {
+                displayRoute(allRoutes[0], 1, allRoutes.length);
+                showNotification(`🏔️ Ruta OFF-ROAD encontrada (${allRoutes[0].profile || 'mtb'})`);
+            } else {
+                // Fallback a OSRM si BRouter falla
+                showNotification('⚠️ BRouter no disponible, usando ruta mixta...');
+                await calculateMixedRoute(startCoords, endCoords);
+            }
+        }
+
+        // Generar steps de navegación desde coordenadas
+        function generateStepsFromCoords(coords, messages) {
+            const steps = [];
+
+            // Crear un step por cada mensaje de BRouter o cada N puntos
+            if (messages && messages.length > 0) {
+                messages.forEach((msg, idx) => {
+                    if (msg[0] !== undefined && msg[1] !== undefined) {
+                        steps.push({
+                            maneuver: {
+                                type: idx === 0 ? 'depart' : (idx === messages.length - 1 ? 'arrive' : 'turn'),
+                                location: [coords[Math.min(idx * 10, coords.length - 1)][0], coords[Math.min(idx * 10, coords.length - 1)][1]],
+                                modifier: msg[2] || 'straight'
+                            },
+                            name: msg[3] || 'Camino',
+                            distance: msg[1] || 0
+                        });
+                    }
+                });
+            }
+
+            // Si no hay mensajes, crear steps básicos
+            if (steps.length === 0) {
+                const step = Math.floor(coords.length / 10) || 1;
+                for (let i = 0; i < coords.length; i += step) {
+                    const coord = coords[i];
+                    steps.push({
+                        maneuver: {
+                            type: i === 0 ? 'depart' : (i >= coords.length - step ? 'arrive' : 'continue'),
+                            location: [coord[0], coord[1]],
+                            modifier: 'straight'
+                        },
+                        name: 'Camino de tierra',
+                        distance: 100
+                    });
+                }
+            }
+
+            return steps;
+        }
+
+        // Generar alternativas off-road con waypoints
+        async function generateOffroadAlternatives(start, end) {
+            const alternatives = [];
+            const midLat = (start.lat + end.lat) / 2;
+            const midLng = (start.lng + end.lng) / 2;
+            const distance = start.distanceTo(end);
+            const offset = distance / 111000 * 0.1; // 10% de la distancia
+
+            const offsets = [
+                { lat: offset, lng: 0 },
+                { lat: -offset, lng: 0 },
+                { lat: 0, lng: offset },
+                { lat: 0, lng: -offset }
+            ];
+
+            for (const off of offsets) {
+                try {
+                    const waypoint = {
+                        lat: midLat + off.lat,
+                        lng: midLng + off.lng
+                    };
+
+                    const brouterUrl = `https://brouter.de/brouter?lonlats=${start.lng},${start.lat}|${waypoint.lng},${waypoint.lat}|${end.lng},${end.lat}&profile=mtb&alternativeidx=0&format=geojson`;
+
+                    const response = await fetch(brouterUrl);
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        if (data.features && data.features.length > 0) {
+                            const feature = data.features[0];
+                            const properties = feature.properties;
+
+                            const route = {
+                                geometry: feature.geometry,
+                                distance: properties['track-length'] || 0,
+                                duration: properties['total-time'] || 0,
+                                ascend: properties['filtered ascend'] || 0,
+                                profile: 'mtb-alt',
+                                legs: [{
+                                    steps: generateStepsFromCoords(feature.geometry.coordinates, properties.messages || [])
+                                }]
+                            };
+
+                            // Solo añadir si es diferente
+                            const isDifferent = !alternatives.some(r =>
+                                Math.abs(r.distance - route.distance) < route.distance * 0.05
+                            );
+
+                            if (isDifferent) {
+                                alternatives.push(route);
+                            }
+                        }
+                    }
+                } catch (e) {
+                    console.log('Error alternativa off-road:', e);
+                }
+            }
+
+            return alternatives;
+        }
+
+        // Calcular ruta MIXTA usando OSRM
+        async function calculateMixedRoute(startCoords, endCoords) {
+            const response = await fetch(
+                `https://router.project-osrm.org/route/v1/driving/${startCoords.lng},${startCoords.lat};${endCoords.lng},${endCoords.lat}?overview=full&geometries=geojson&steps=true&alternatives=3`
+            );
+
+            if (!response.ok) throw new Error('Error en la API');
+
+            const data = await response.json();
+
+            if (data.routes && data.routes.length > 0) {
+                allRoutes = data.routes;
+
+                // Si solo hay una ruta, intentar generar alternativas con waypoints
+                if (allRoutes.length === 1) {
+                    const extraRoutes = await generateAlternativeRoutes(startCoords, endCoords);
+                    allRoutes = [...allRoutes, ...extraRoutes];
+                }
+
+                displayRoute(allRoutes[0], 1, allRoutes.length);
+            }
         }
 
         // Generar rutas alternativas con waypoints aleatorios
@@ -1192,18 +1309,40 @@
             map.fitBounds(routeLayer.getBounds(), { padding: [50, 50] });
 
             const distance = (route.distance / 1000).toFixed(1);
-            const duration = Math.round(route.duration / 60);
-            const adjustedDuration = routeType === 'offroad' ? Math.round(duration * 1.5) : duration;
+
+            // Calcular duración (BRouter da segundos, OSRM también)
+            let duration;
+            if (route.duration) {
+                duration = Math.round(route.duration / 60);
+            } else {
+                // Estimar: 20 km/h en off-road, 40 km/h en mixto
+                const avgSpeed = routeType === 'offroad' ? 20 : 40;
+                duration = Math.round((route.distance / 1000) / avgSpeed * 60);
+            }
+
+            // Ajustar tiempo para off-road (más lento)
+            const adjustedDuration = routeType === 'offroad' ? Math.round(duration * 1.3) : duration;
+
+            // Mostrar desnivel real si está disponible (BRouter)
+            let elevation;
+            if (route.ascend) {
+                elevation = Math.round(route.ascend);
+            } else {
+                elevation = Math.round(parseFloat(distance) * 15); // Estimación
+            }
 
             document.getElementById('distance').textContent = `${distance} km`;
             document.getElementById('duration').textContent = `${adjustedDuration} min`;
-            document.getElementById('elevation').textContent = `~${Math.round(distance * 15)} m`;
+            document.getElementById('elevation').textContent = `↑${elevation} m`;
             document.getElementById('routeInfo').classList.remove('hidden');
 
+            // Mostrar el tipo de ruta
+            const profileText = route.profile ? ` (${route.profile})` : '';
+
             if (total > 1) {
-                showNotification(`🛤️ Ruta ${index} de ${total} - ¡Pulsa de nuevo para ver otra!`);
+                showNotification(`🛤️ Ruta ${index}/${total}${profileText} - ¡Pulsa para ver otra!`);
             } else {
-                showNotification('✅ Ruta calculada. ¡Pulsa INICIAR NAVEGACIÓN!');
+                showNotification(`✅ Ruta calculada${profileText} - ¡Pulsa INICIAR!`);
             }
         }
 
@@ -1967,11 +2106,8 @@
         }
 
         // Prevent pull-to-refresh on mobile
-        // Prevent pull-to-refresh on mobile but allow scrolling in menu
         document.body.addEventListener('touchmove', function (e) {
             if (e.target.closest('#map')) return;
-            if (e.target.closest('.menu-panel')) return;
-            if (e.target.closest('.search-results')) return;
             e.preventDefault();
         }, { passive: false });
 
