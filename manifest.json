@@ -1,0 +1,28 @@
+{
+    "name": "Enduro Route Planner",
+    "short_name": "EnduroGPS",
+    "description": "GPS Off-Road para rutas de enduro - Evita asfalto, busca caminos de tierra",
+    "start_url": "/index.html",
+    "display": "standalone",
+    "orientation": "portrait",
+    "background_color": "#111827",
+    "theme_color": "#f97316",
+    "icons": [
+        {
+            "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect fill='%23111827' width='512' height='512' rx='64'/><circle cx='256' cy='280' r='140' fill='none' stroke='%23f97316' stroke-width='24'/><circle cx='256' cy='280' r='60' fill='%23f97316'/><polygon points='256,80 276,140 236,140' fill='%23f97316'/><text x='256' y='460' text-anchor='middle' fill='%23fff' font-size='48' font-family='Arial' font-weight='bold'>ENDURO</text></svg>",
+            "sizes": "512x512",
+            "type": "image/svg+xml",
+            "purpose": "any maskable"
+        }
+    ],
+    "categories": [
+        "navigation",
+        "sports"
+    ],
+    "lang": "es",
+    "dir": "ltr",
+    "scope": "/",
+    "permissions": [
+        "geolocation"
+    ]
+}
