@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Enduro Route Planner - GPS Off-Road</title>
-    
+
     <!-- PWA Meta Tags -->
     <meta name="description" content="GPS Off-Road para rutas de enduro - Evita asfalto, busca caminos de tierra">
     <meta name="theme-color" content="#f97316">
@@ -14,14 +15,16 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="msapplication-TileColor" content="#111827">
     <meta name="msapplication-tap-highlight" content="no">
-    
+
     <!-- Manifest -->
     <link rel="manifest" href="manifest.json">
-    
+
     <!-- Icons -->
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect fill='%23111827' width='512' height='512' rx='64'/><circle cx='256' cy='280' r='140' fill='none' stroke='%23f97316' stroke-width='24'/><circle cx='256' cy='280' r='60' fill='%23f97316'/><polygon points='256,80 276,140 236,140' fill='%23f97316'/></svg>">
-    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect fill='%23111827' width='512' height='512' rx='64'/><circle cx='256' cy='280' r='140' fill='none' stroke='%23f97316' stroke-width='24'/><circle cx='256' cy='280' r='60' fill='%23f97316'/><polygon points='256,80 276,140 236,140' fill='%23f97316'/></svg>">
-    
+    <link rel="icon" type="image/svg+xml"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect fill='%23111827' width='512' height='512' rx='64'/><circle cx='256' cy='280' r='140' fill='none' stroke='%23f97316' stroke-width='24'/><circle cx='256' cy='280' r='60' fill='%23f97316'/><polygon points='256,80 276,140 236,140' fill='%23f97316'/></svg>">
+    <link rel="apple-touch-icon"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect fill='%23111827' width='512' height='512' rx='64'/><circle cx='256' cy='280' r='140' fill='none' stroke='%23f97316' stroke-width='24'/><circle cx='256' cy='280' r='60' fill='%23f97316'/><polygon points='256,80 276,140 236,140' fill='%23f97316'/></svg>">
+
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -31,32 +34,36 @@
             -webkit-tap-highlight-color: transparent;
             -webkit-touch-callout: none;
         }
-        
-        html, body {
+
+        html,
+        body {
             touch-action: manipulation;
             overscroll-behavior: none;
         }
-        
-        #map { 
-            height: 100vh; 
+
+        #map {
+            height: 100vh;
             height: 100dvh;
-            width: 100%; 
+            width: 100%;
             position: fixed !important;
             top: 0;
             left: 0;
             z-index: 1;
         }
-        .leaflet-container { 
+
+        .leaflet-container {
             font-family: inherit;
             background: #1a1a2e !important;
         }
+
         .leaflet-tile-pane {
             z-index: 2 !important;
         }
+
         .leaflet-control-zoom {
             display: none !important;
         }
-        
+
         .custom-marker {
             width: 40px;
             height: 40px;
@@ -68,9 +75,9 @@
             font-weight: bold;
             font-size: 18px;
             border: 4px solid white;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
         }
-        
+
         /* Marcador de vehículo tipo flecha/moto */
         .vehicle-marker {
             width: 70px;
@@ -78,13 +85,14 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            filter: drop-shadow(0 6px 12px rgba(0,0,0,0.6));
+            filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.6));
         }
+
         .vehicle-icon-svg {
             width: 70px;
             height: 70px;
         }
-        
+
         .user-marker {
             width: 28px;
             height: 28px;
@@ -94,11 +102,19 @@
             box-shadow: 0 0 20px rgba(59, 130, 246, 0.8);
             animation: pulse 2s infinite;
         }
+
         @keyframes pulse {
-            0%, 100% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.8); }
-            50% { box-shadow: 0 0 40px rgba(59, 130, 246, 1); }
+
+            0%,
+            100% {
+                box-shadow: 0 0 20px rgba(59, 130, 246, 0.8);
+            }
+
+            50% {
+                box-shadow: 0 0 40px rgba(59, 130, 246, 1);
+            }
         }
-        
+
         /* Cartel grande de giro tipo Waze - OPTIMIZADO MÓVIL */
         .turn-billboard {
             position: fixed;
@@ -111,14 +127,16 @@
             border-radius: 20px;
             padding: 20px 30px;
             text-align: center;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.9);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.9);
             transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
             width: 85vw;
             max-width: 320px;
         }
+
         .turn-billboard.show {
             transform: translate(-50%, -50%) scale(1);
         }
+
         .turn-billboard .turn-arrow {
             font-size: 80px;
             color: #f97316;
@@ -126,17 +144,20 @@
             text-shadow: 0 0 30px rgba(249, 115, 22, 0.8);
             animation: bounce-turn 0.5s ease infinite alternate;
         }
+
         .turn-billboard .turn-text {
             font-size: 22px;
             font-weight: bold;
             color: white;
             margin-bottom: 8px;
         }
+
         .turn-billboard .turn-distance {
             font-size: 42px;
             font-weight: bold;
             color: #fbbf24;
         }
+
         .turn-billboard .turn-street {
             font-size: 14px;
             color: #9ca3af;
@@ -145,11 +166,17 @@
             overflow: hidden;
             text-overflow: ellipsis;
         }
+
         @keyframes bounce-turn {
-            from { transform: scale(1); }
-            to { transform: scale(1.1); }
+            from {
+                transform: scale(1);
+            }
+
+            to {
+                transform: scale(1.1);
+            }
         }
-        
+
         /* MENÚ MÓVIL OPTIMIZADO */
         .menu-panel {
             position: fixed;
@@ -160,16 +187,18 @@
             background: rgba(17, 24, 39, 0.98);
             backdrop-filter: blur(12px);
             border-radius: 24px 24px 0 0;
-            padding: 16px 16px 24px;
-            max-height: 75vh;
+            padding: 16px 16px max(30px, env(safe-area-inset-bottom) + 20px);
+            max-height: 85dvh;
             overflow-y: auto;
             border-top: 3px solid #f97316;
-            box-shadow: 0 -10px 40px rgba(0,0,0,0.7);
+            box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.7);
             transition: transform 0.3s ease;
         }
+
         .menu-panel.collapsed {
             transform: translateY(calc(100% - 70px));
         }
+
         .menu-handle {
             width: 50px;
             height: 5px;
@@ -177,6 +206,7 @@
             border-radius: 3px;
             margin: 0 auto 12px;
         }
+
         .menu-header {
             display: flex;
             align-items: center;
@@ -185,7 +215,7 @@
             border-bottom: 1px solid #374151;
             margin-bottom: 16px;
         }
-        
+
         /* NAVEGACIÓN MÓVIL */
         .nav-panel {
             position: fixed;
@@ -199,6 +229,7 @@
             padding-top: max(12px, env(safe-area-inset-top));
             border-bottom: 3px solid #f97316;
         }
+
         .nav-bottom {
             position: fixed;
             bottom: 0;
@@ -211,6 +242,7 @@
             padding-bottom: max(16px, env(safe-area-inset-bottom));
             border-top: 2px solid #374151;
         }
+
         .turn-icon {
             width: 56px;
             height: 56px;
@@ -224,6 +256,7 @@
             color: white;
             box-shadow: 0 4px 15px rgba(249, 115, 22, 0.4);
         }
+
         .speed-display {
             width: 70px;
             height: 70px;
@@ -236,22 +269,25 @@
             align-items: center;
             justify-content: center;
         }
+
         .progress-bar {
             height: 8px;
             background: #374151;
             border-radius: 4px;
             overflow: hidden;
         }
+
         .progress-fill {
             height: 100%;
             background: linear-gradient(90deg, #f97316, #fbbf24);
             transition: width 0.5s ease;
         }
-        
+
         /* BÚSQUEDA MÓVIL */
         .search-container {
             position: relative;
         }
+
         .search-results {
             position: absolute;
             top: 100%;
@@ -266,9 +302,11 @@
             z-index: 1002;
             display: none;
         }
+
         .search-results.show {
             display: block;
         }
+
         .search-result-item {
             padding: 14px 16px;
             cursor: pointer;
@@ -279,17 +317,21 @@
             gap: 12px;
             -webkit-tap-highlight-color: rgba(249, 115, 22, 0.3);
         }
+
         .search-result-item:last-child {
             border-bottom: none;
         }
+
         .search-result-item:active {
             background: #374151;
         }
+
         .search-result-item i {
             color: #f97316;
             margin-top: 3px;
             font-size: 18px;
         }
+
         .search-input {
             width: 100%;
             background: #111827;
@@ -302,14 +344,17 @@
             box-shadow: 0 2px 8px rgba(249, 115, 22, 0.2);
             -webkit-appearance: none;
         }
+
         .search-input:focus {
             outline: none;
             border-color: #fbbf24;
             box-shadow: 0 0 20px rgba(249, 115, 22, 0.5);
         }
+
         .search-input::placeholder {
             color: #6b7280;
         }
+
         .search-icon {
             position: absolute;
             left: 16px;
@@ -319,6 +364,7 @@
             pointer-events: none;
             font-size: 18px;
         }
+
         .search-clear {
             position: absolute;
             right: 12px;
@@ -329,9 +375,11 @@
             padding: 8px;
             font-size: 18px;
         }
+
         .search-clear:active {
             color: white;
         }
+
         .search-loading {
             position: absolute;
             right: 14px;
@@ -340,7 +388,7 @@
             color: #f97316;
             font-size: 18px;
         }
-        
+
         /* BOTONES MÓVIL */
         .btn-mobile {
             min-height: 52px;
@@ -354,29 +402,34 @@
             transition: all 0.15s;
             -webkit-tap-highlight-color: transparent;
         }
+
         .btn-mobile:active {
             transform: scale(0.97);
             opacity: 0.9;
         }
+
         .btn-primary {
             background: linear-gradient(135deg, #f59e0b, #d97706);
             color: #111827;
             box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4);
         }
+
         .btn-success {
             background: linear-gradient(135deg, #22c55e, #16a34a);
             color: white;
             box-shadow: 0 4px 15px rgba(34, 197, 94, 0.4);
         }
+
         .btn-danger {
             background: linear-gradient(135deg, #ef4444, #dc2626);
             color: white;
         }
+
         .btn-secondary {
             background: #374151;
             color: white;
         }
-        
+
         /* FAB BUTTONS */
         .fab-container {
             position: fixed;
@@ -387,6 +440,7 @@
             flex-direction: column;
             gap: 12px;
         }
+
         .fab {
             width: 56px;
             height: 56px;
@@ -395,13 +449,14 @@
             align-items: center;
             justify-content: center;
             font-size: 22px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
             -webkit-tap-highlight-color: transparent;
         }
+
         .fab:active {
             transform: scale(0.93);
         }
-        
+
         /* INFO CARDS */
         .info-card {
             background: #1f2937;
@@ -409,21 +464,24 @@
             padding: 12px;
             text-align: center;
         }
+
         .info-card i {
             font-size: 20px;
             color: #f97316;
             margin-bottom: 4px;
         }
+
         .info-card .value {
             font-size: 18px;
             font-weight: bold;
         }
+
         .info-card .label {
             font-size: 11px;
             color: #9ca3af;
             text-transform: uppercase;
         }
-        
+
         /* NOTIFICATION TOAST */
         .notification-toast {
             position: fixed;
@@ -435,25 +493,27 @@
             color: white;
             padding: 16px;
             border-radius: 14px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
             z-index: 3000;
             text-align: center;
             font-size: 15px;
             font-weight: 500;
         }
-        
+
         /* Esconder scrollbar pero permitir scroll */
         .menu-panel::-webkit-scrollbar {
             width: 0;
             display: none;
         }
-        
+
         /* Modo oscuro para inputs */
-        input, select {
+        input,
+        select {
             color-scheme: dark;
         }
     </style>
 </head>
+
 <body class="bg-gray-900 text-white m-0 p-0" style="overflow: hidden; position: fixed; width: 100%; height: 100dvh;">
     <!-- Map Container -->
     <div id="map"></div>
@@ -475,7 +535,7 @@
     <div class="menu-panel" id="menuPanel">
         <!-- Handle para arrastrar -->
         <div class="menu-handle" id="menuHandle"></div>
-        
+
         <!-- Header -->
         <div class="menu-header">
             <i class="fas fa-motorcycle text-3xl text-orange-500"></i>
@@ -492,12 +552,14 @@
             <!-- Campo de búsqueda ORIGEN -->
             <div class="mb-4">
                 <div class="flex items-center gap-2 mb-2">
-                    <span class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center text-sm font-bold text-white shadow-lg">A</span>
+                    <span
+                        class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center text-sm font-bold text-white shadow-lg">A</span>
                     <span class="text-sm text-gray-300 font-semibold">Punto de Inicio</span>
                 </div>
                 <div class="search-container">
                     <i class="fas fa-search search-icon"></i>
-                    <input type="text" id="searchInputA" class="search-input" placeholder="Buscar origen..." autocomplete="off">
+                    <input type="text" id="searchInputA" class="search-input" placeholder="Buscar origen..."
+                        autocomplete="off">
                     <i class="fas fa-times search-clear hidden" id="clearSearchA"></i>
                     <i class="fas fa-spinner fa-spin search-loading hidden" id="loadingA"></i>
                     <div class="search-results" id="resultsA"></div>
@@ -507,12 +569,14 @@
             <!-- Campo de búsqueda DESTINO -->
             <div class="mb-4">
                 <div class="flex items-center gap-2 mb-2">
-                    <span class="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center text-sm font-bold text-white shadow-lg">B</span>
+                    <span
+                        class="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center text-sm font-bold text-white shadow-lg">B</span>
                     <span class="text-sm text-gray-300 font-semibold">Punto de Destino</span>
                 </div>
                 <div class="search-container">
                     <i class="fas fa-search search-icon"></i>
-                    <input type="text" id="searchInputB" class="search-input" placeholder="Buscar destino..." autocomplete="off">
+                    <input type="text" id="searchInputB" class="search-input" placeholder="Buscar destino..."
+                        autocomplete="off">
                     <i class="fas fa-times search-clear hidden" id="clearSearchB"></i>
                     <i class="fas fa-spinner fa-spin search-loading hidden" id="loadingB"></i>
                     <div class="search-results" id="resultsB"></div>
@@ -521,7 +585,8 @@
 
             <!-- Marcar en mapa -->
             <div class="grid grid-cols-2 gap-3 mb-4">
-                <button id="btnSetA" class="btn-mobile btn-success ring-2 ring-white ring-offset-2 ring-offset-gray-900">
+                <button id="btnSetA"
+                    class="btn-mobile btn-success ring-2 ring-white ring-offset-2 ring-offset-gray-900">
                     <i class="fas fa-map-pin"></i>
                     Marcar A
                 </button>
@@ -536,17 +601,20 @@
                 <div>
                     <label class="text-xs text-gray-400 uppercase tracking-wider mb-2 block">Tipo Ruta</label>
                     <div class="flex bg-gray-800 rounded-xl p-1">
-                        <button id="btnOffroad" class="flex-1 py-2.5 bg-orange-600 rounded-lg text-sm font-bold transition">
+                        <button id="btnOffroad"
+                            class="flex-1 py-2.5 bg-orange-600 rounded-lg text-sm font-bold transition">
                             <i class="fas fa-mountain"></i>
                         </button>
-                        <button id="btnMixed" class="flex-1 py-2.5 rounded-lg text-sm font-bold transition text-gray-400">
+                        <button id="btnMixed"
+                            class="flex-1 py-2.5 rounded-lg text-sm font-bold transition text-gray-400">
                             <i class="fas fa-road"></i>
                         </button>
                     </div>
                 </div>
                 <div>
                     <label class="text-xs text-gray-400 uppercase tracking-wider mb-2 block">Mapa</label>
-                    <select id="mapType" class="w-full bg-gray-800 border-2 border-gray-600 rounded-xl px-3 py-2.5 text-sm font-medium focus:outline-none focus:border-orange-500">
+                    <select id="mapType"
+                        class="w-full bg-gray-800 border-2 border-gray-600 rounded-xl px-3 py-2.5 text-sm font-medium focus:outline-none focus:border-orange-500">
                         <option value="cyclosm" selected>🏍️ Caminos</option>
                         <option value="mtb">🚵 MTB</option>
                         <option value="topo">⛰️ Topo</option>
@@ -606,7 +674,7 @@
                 <div class="turn-icon" id="turnIcon">
                     <i class="fas fa-arrow-up"></i>
                 </div>
-                
+
                 <!-- Turn Instructions -->
                 <div class="flex-1 min-w-0">
                     <p class="text-2xl font-bold text-orange-400" id="turnDistance">--</p>
@@ -615,7 +683,8 @@
                 </div>
 
                 <!-- Close Button -->
-                <button id="btnCloseNav" class="w-12 h-12 min-w-12 bg-red-600 active:bg-red-500 rounded-full flex items-center justify-center shadow-lg">
+                <button id="btnCloseNav"
+                    class="w-12 h-12 min-w-12 bg-red-600 active:bg-red-500 rounded-full flex items-center justify-center shadow-lg">
                     <i class="fas fa-times text-xl"></i>
                 </button>
             </div>
@@ -650,21 +719,24 @@
                 </div>
 
                 <!-- Center on Me Button -->
-                <button id="btnCenterMe" class="w-14 h-14 min-w-14 bg-gray-700 active:bg-gray-600 rounded-full flex items-center justify-center shadow-lg">
+                <button id="btnCenterMe"
+                    class="w-14 h-14 min-w-14 bg-gray-700 active:bg-gray-600 rounded-full flex items-center justify-center shadow-lg">
                     <i class="fas fa-location-arrow text-xl text-orange-400"></i>
                 </button>
             </div>
-            
+
             <!-- Demo Mode Button -->
             <div class="mt-3 flex justify-center">
-                <button id="btnDemoMode" class="px-5 py-3 bg-gray-700 active:bg-gray-600 rounded-xl text-sm text-gray-300 flex items-center gap-2 font-medium">
+                <button id="btnDemoMode"
+                    class="px-5 py-3 bg-gray-700 active:bg-gray-600 rounded-xl text-sm text-gray-300 flex items-center gap-2 font-medium">
                     <i class="fas fa-play-circle text-orange-400"></i>
                     Modo Demo
                 </button>
             </div>
 
             <!-- Alert Banner -->
-            <div id="alertBanner" class="hidden mt-3 bg-gradient-to-r from-orange-600 to-amber-500 rounded-xl p-4 flex items-center gap-3 animate-pulse">
+            <div id="alertBanner"
+                class="hidden mt-3 bg-gradient-to-r from-orange-600 to-amber-500 rounded-xl p-4 flex items-center gap-3 animate-pulse">
                 <i class="fas fa-exclamation-triangle text-2xl"></i>
                 <span class="font-bold text-base" id="alertText">¡Prepárate para girar!</span>
             </div>
@@ -774,7 +846,7 @@
                 iconAnchor: [12, 12]
             });
         }
-        
+
         // Crear icono de vehículo con flecha direccional para navegación (tipo moto/GPS)
         function createVehicleIcon(heading = 0) {
             return L.divIcon({
@@ -797,7 +869,7 @@
                 iconAnchor: [35, 35]
             });
         }
-        
+
         // Variables para la navegación avanzada
         let currentHeading = 0;
         let lastHeading = 0;
@@ -806,7 +878,7 @@
         let billboardTimeout = null;
 
         // Event Listeners
-        document.getElementById('mapType').addEventListener('change', function(e) {
+        document.getElementById('mapType').addEventListener('change', function (e) {
             // Remover capa actual (puede ser layer o layerGroup)
             if (currentLayer.eachLayer) {
                 currentLayer.eachLayer(layer => map.removeLayer(layer));
@@ -821,7 +893,7 @@
         const menuPanel = document.getElementById('menuPanel');
         const toggleMenuBtn = document.getElementById('toggleMenu');
         const menuHandle = document.getElementById('menuHandle');
-        
+
         function toggleMenu() {
             const content = document.getElementById('menuContent');
             const icon = toggleMenuBtn.querySelector('i');
@@ -830,10 +902,10 @@
             icon.classList.toggle('fa-chevron-up');
             icon.classList.toggle('fa-chevron-down');
         }
-        
+
         toggleMenuBtn.addEventListener('click', toggleMenu);
         menuHandle.addEventListener('click', toggleMenu);
-        
+
         // Zoom buttons
         document.getElementById('btnZoomIn').addEventListener('click', () => map.zoomIn());
         document.getElementById('btnZoomOut').addEventListener('click', () => map.zoomOut());
@@ -872,7 +944,7 @@
         function updateButtonStyles() {
             const btnA = document.getElementById('btnSetA');
             const btnB = document.getElementById('btnSetB');
-            
+
             if (currentMode === 'A') {
                 btnA.classList.add('ring-2', 'ring-white', 'ring-offset-2', 'ring-offset-gray-900');
                 btnB.classList.remove('ring-2', 'ring-white', 'ring-offset-2', 'ring-offset-gray-900');
@@ -885,7 +957,7 @@
         function updateRouteTypeButtons() {
             const btnOffroad = document.getElementById('btnOffroad');
             const btnMixed = document.getElementById('btnMixed');
-            
+
             if (routeType === 'offroad') {
                 btnOffroad.classList.add('bg-orange-600');
                 btnOffroad.classList.remove('hover:bg-gray-700');
@@ -900,11 +972,11 @@
         }
 
         // Map click handler
-        map.on('click', function(e) {
+        map.on('click', function (e) {
             if (isNavigating) return;
-            
+
             const latlng = e.latlng;
-            
+
             if (currentMode === 'A') {
                 if (markerA) map.removeLayer(markerA);
                 markerA = L.marker(latlng, {
@@ -912,10 +984,10 @@
                     draggable: true
                 }).addTo(map);
                 markerA.bindPopup('<b>Punto de Inicio</b>').openPopup();
-                
+
                 // Update search input and reverse geocode
                 reverseGeocode(latlng, 'A');
-                
+
                 currentMode = 'B';
                 updateButtonStyles();
             } else {
@@ -925,38 +997,38 @@
                     draggable: true
                 }).addTo(map);
                 markerB.bindPopup('<b>Punto de Destino</b>').openPopup();
-                
+
                 // Update search input and reverse geocode
                 reverseGeocode(latlng, 'B');
-                
+
                 currentMode = 'A';
                 updateButtonStyles();
             }
         });
-        
+
         // Reverse geocode to get address from coordinates
         async function reverseGeocode(latlng, point) {
             const input = point === 'A' ? searchInputA : searchInputB;
             const clearBtn = point === 'A' ? clearSearchA : clearSearchB;
-            
+
             input.value = '📍 Cargando dirección...';
             clearBtn.classList.remove('hidden');
-            
+
             try {
                 const response = await fetch(
                     `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latlng.lat}&lon=${latlng.lng}&addressdetails=1`,
                     { headers: { 'Accept-Language': 'es' } }
                 );
-                
+
                 const data = await response.json();
-                
+
                 if (data && data.display_name) {
-                    const shortName = data.address?.road || 
-                                     data.address?.hamlet || 
-                                     data.address?.village || 
-                                     data.address?.town || 
-                                     data.address?.city ||
-                                     data.display_name.split(',')[0];
+                    const shortName = data.address?.road ||
+                        data.address?.hamlet ||
+                        data.address?.village ||
+                        data.address?.town ||
+                        data.address?.city ||
+                        data.display_name.split(',')[0];
                     input.value = shortName;
                 } else {
                     input.value = `📍 ${latlng.lat.toFixed(4)}, ${latlng.lng.toFixed(4)}`;
@@ -983,7 +1055,7 @@
             const startCoords = markerA.getLatLng();
             const endCoords = markerB.getLatLng();
             const requestKey = `${startCoords.lat},${startCoords.lng}-${endCoords.lat},${endCoords.lng}`;
-            
+
             // Si es la misma ruta, mostrar la siguiente alternativa
             if (lastRouteRequest === requestKey && allRoutes.length > 1) {
                 currentRouteIndex = (currentRouteIndex + 1) % allRoutes.length;
@@ -991,12 +1063,12 @@
                 document.getElementById('loading').classList.add('hidden');
                 return;
             }
-            
+
             // Nueva búsqueda de rutas
             lastRouteRequest = requestKey;
             allRoutes = [];
             currentRouteIndex = 0;
-            
+
             try {
                 // Pedir rutas alternativas a OSRM
                 const response = await fetch(
@@ -1006,16 +1078,16 @@
                 if (!response.ok) throw new Error('Error en la API');
 
                 const data = await response.json();
-                
+
                 if (data.routes && data.routes.length > 0) {
                     allRoutes = data.routes;
-                    
+
                     // Si solo hay una ruta, intentar generar alternativas con waypoints
                     if (allRoutes.length === 1) {
                         const extraRoutes = await generateAlternativeRoutes(startCoords, endCoords);
                         allRoutes = [...allRoutes, ...extraRoutes];
                     }
-                    
+
                     displayRoute(allRoutes[0], 1, allRoutes.length);
                 }
             } catch (error) {
@@ -1025,7 +1097,7 @@
 
             document.getElementById('loading').classList.add('hidden');
         }
-        
+
         // Generar rutas alternativas con waypoints aleatorios
         async function generateAlternativeRoutes(start, end) {
             const alternatives = [];
@@ -1033,7 +1105,7 @@
             const midLng = (start.lng + end.lng) / 2;
             const distance = start.distanceTo(end);
             const offset = distance / 111000 * 0.15; // 15% de la distancia en grados
-            
+
             // Generar 3 waypoints diferentes (izquierda, derecha, arriba)
             const offsets = [
                 { lat: offset, lng: offset },      // Noreste
@@ -1043,24 +1115,24 @@
                 { lat: offset * 1.5, lng: 0 },     // Norte
                 { lat: -offset * 1.5, lng: 0 },    // Sur
             ];
-            
+
             for (const off of offsets) {
                 try {
                     const waypoint = {
                         lat: midLat + off.lat + (Math.random() - 0.5) * offset * 0.5,
                         lng: midLng + off.lng + (Math.random() - 0.5) * offset * 0.5
                     };
-                    
+
                     const response = await fetch(
                         `https://router.project-osrm.org/route/v1/driving/${start.lng},${start.lat};${waypoint.lng},${waypoint.lat};${end.lng},${end.lat}?overview=full&geometries=geojson&steps=true`
                     );
-                    
+
                     if (response.ok) {
                         const data = await response.json();
                         if (data.routes && data.routes.length > 0) {
                             // Solo añadir si es significativamente diferente
                             const newDist = data.routes[0].distance;
-                            const isDifferent = !alternatives.some(r => 
+                            const isDifferent = !alternatives.some(r =>
                                 Math.abs(r.distance - newDist) < newDist * 0.05
                             );
                             if (isDifferent && alternatives.length < 5) {
@@ -1072,42 +1144,42 @@
                     console.log('Error generando alternativa:', e);
                 }
             }
-            
+
             return alternatives;
         }
-        
+
         // Mostrar una ruta específica
         function displayRoute(route, index, total) {
             if (routeLayer) map.removeLayer(routeLayer);
-            
+
             // Store route data for navigation
             routeCoordinates = route.geometry.coordinates.map(c => [c[1], c[0]]);
             routeSteps = route.legs ? route.legs[0].steps : [];
             totalDistance = route.distance;
-            
+
             // Colores diferentes para cada ruta alternativa
             const colors = ['#f97316', '#10b981', '#8b5cf6', '#ec4899', '#06b6d4', '#eab308'];
             const routeColor = colors[(index - 1) % colors.length];
-            
+
             const routeStyle = {
                 color: routeColor,
                 weight: 6,
                 opacity: 0.85,
                 dashArray: routeType === 'offroad' ? '12, 8' : null
             };
-            
+
             routeLayer = L.geoJSON(route.geometry, { style: routeStyle }).addTo(map);
             map.fitBounds(routeLayer.getBounds(), { padding: [50, 50] });
-            
+
             const distance = (route.distance / 1000).toFixed(1);
             const duration = Math.round(route.duration / 60);
             const adjustedDuration = routeType === 'offroad' ? Math.round(duration * 1.5) : duration;
-            
+
             document.getElementById('distance').textContent = `${distance} km`;
             document.getElementById('duration').textContent = `${adjustedDuration} min`;
             document.getElementById('elevation').textContent = `~${Math.round(distance * 15)} m`;
             document.getElementById('routeInfo').classList.remove('hidden');
-            
+
             if (total > 1) {
                 showNotification(`🛤️ Ruta ${index} de ${total} - ¡Pulsa de nuevo para ver otra!`);
             } else {
@@ -1124,36 +1196,36 @@
 
             isNavigating = true;
             currentStepIndex = 0;
-            
+
             // Hide planning UI, show navigation UI
             document.getElementById('menuPanel').classList.add('hidden');
             document.getElementById('fabContainer').classList.add('hidden');
             document.getElementById('navMode').classList.remove('hidden');
-            
+
             // Crear marcador de vehículo
             if (vehicleMarker) map.removeLayer(vehicleMarker);
             if (userMarker) map.removeLayer(userMarker);
-            
+
             // Centrar en el inicio de la ruta primero
             const startPoint = L.latLng(routeCoordinates[0][0], routeCoordinates[0][1]);
-            
+
             // Forzar actualización del mapa después de un pequeño delay
             setTimeout(() => {
                 map.invalidateSize();
                 map.setView(startPoint, 15);
-                
+
                 // Crear marcador de vehículo en el punto inicial
                 vehicleMarker = L.marker(startPoint, {
                     icon: createVehicleIcon(0),
                     zIndexOffset: 1000
                 }).addTo(map);
-                
+
                 // Forzar recarga de tiles
                 setTimeout(() => {
                     map.invalidateSize();
                 }, 100);
             }, 50);
-            
+
             // Start watching position
             if ('geolocation' in navigator) {
                 watchId = navigator.geolocation.watchPosition(
@@ -1165,7 +1237,7 @@
                         timeout: 10000
                     }
                 );
-                
+
                 showNotification('🧭 Navegación iniciada - Esperando GPS...');
                 document.getElementById('turnInstruction').textContent = 'Esperando señal GPS...';
                 document.getElementById('turnDistance').textContent = 'Activa tu GPS';
@@ -1173,10 +1245,10 @@
                 showNotification('⚠️ Geolocalización no disponible en este dispositivo');
                 document.getElementById('turnInstruction').textContent = 'GPS no disponible';
             }
-            
+
             // Activar wake lock para mantener pantalla encendida
             requestWakeLock();
-            
+
             // Initial UI update
             updateNavigationUI();
         }
@@ -1188,21 +1260,21 @@
             const accuracy = position.coords.accuracy;
             const speed = position.coords.speed;
             const heading = position.coords.heading;
-            
+
             // Update speed
             currentSpeed = speed ? Math.round(speed * 3.6) : 0;
             document.getElementById('currentSpeed').textContent = currentSpeed;
-            
+
             // Calcular heading si no está disponible
             const userLatLng = L.latLng(lat, lng);
-            
+
             if (lastPosition) {
                 const calculatedHeading = calculateBearing(lastPosition, userLatLng);
                 if (calculatedHeading !== null && currentSpeed > 2) {
                     currentHeading = heading || calculatedHeading;
                 }
             }
-            
+
             // Update or create vehicle marker (flecha direccional)
             if (vehicleMarker) {
                 vehicleMarker.setLatLng(userLatLng);
@@ -1213,101 +1285,101 @@
                     zIndexOffset: 1000
                 }).addTo(map);
             }
-            
+
             // El icono del vehículo rota según heading
             rotateMap(currentHeading);
-            
+
             // Center map on user - zoom moderado para ver bien el mapa
             map.setView(userLatLng, 15);
-            
+
             // Asegurar que el mapa se renderiza correctamente
             if (!map._loaded) {
                 map.invalidateSize();
             }
-            
+
             // Calculate distance to destination
             const destLatLng = L.latLng(routeCoordinates[routeCoordinates.length - 1]);
             const remainingDist = userLatLng.distanceTo(destLatLng);
-            
+
             // Update remaining distance
             if (remainingDist > 1000) {
-                document.getElementById('navRemaining').textContent = `${(remainingDist/1000).toFixed(1)} km`;
+                document.getElementById('navRemaining').textContent = `${(remainingDist / 1000).toFixed(1)} km`;
             } else {
                 document.getElementById('navRemaining').textContent = `${Math.round(remainingDist)} m`;
             }
-            
+
             // Calculate progress
             const startLatLng = L.latLng(routeCoordinates[0]);
             const totalDist = startLatLng.distanceTo(destLatLng);
             const progress = Math.max(0, Math.min(100, ((totalDist - remainingDist) / totalDist) * 100));
             document.getElementById('progressFill').style.width = `${progress}%`;
-            
+
             // Calculate ETA
             const avgSpeed = currentSpeed > 5 ? currentSpeed : 30; // Default 30 km/h
             const etaMinutes = Math.round((remainingDist / 1000) / avgSpeed * 60);
             const etaTime = new Date(Date.now() + etaMinutes * 60000);
             document.getElementById('navETA').textContent = etaTime.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
-            
+
             // Find current step
             updateCurrentStep(userLatLng);
-            
+
             // Check if arrived
             if (remainingDist < 50) {
                 showNotification('🎉 ¡Has llegado a tu destino!');
                 stopNavigation();
             }
-            
+
             lastPosition = userLatLng;
         }
 
         // Update current navigation step
         function updateCurrentStep(userLatLng) {
             if (!routeSteps || routeSteps.length === 0) return;
-            
+
             // Find the closest step
             let minDist = Infinity;
             let closestStepIdx = currentStepIndex;
-            
+
             for (let i = currentStepIndex; i < routeSteps.length; i++) {
                 const step = routeSteps[i];
                 const stepCoord = step.maneuver.location;
                 const stepLatLng = L.latLng(stepCoord[1], stepCoord[0]);
                 const dist = userLatLng.distanceTo(stepLatLng);
-                
+
                 if (dist < minDist) {
                     minDist = dist;
                     closestStepIdx = i;
                 }
             }
-            
+
             currentStepIndex = closestStepIdx;
             const currentStep = routeSteps[currentStepIndex];
-            
+
             // Update turn instruction
             const maneuver = currentStep.maneuver;
             const turnType = maneuver.type;
             const modifier = maneuver.modifier || '';
-            
+
             // Get turn icon
             const turnIcon = getTurnIcon(turnType, modifier);
             document.getElementById('turnIcon').innerHTML = `<i class="fas ${turnIcon}"></i>`;
-            
+
             // Distance to next maneuver
             if (minDist > 1000) {
-                document.getElementById('turnDistance').textContent = `${(minDist/1000).toFixed(1)} km`;
+                document.getElementById('turnDistance').textContent = `${(minDist / 1000).toFixed(1)} km`;
             } else {
                 document.getElementById('turnDistance').textContent = `${Math.round(minDist)} m`;
             }
-            
+
             // Instruction text
             const instruction = getInstructionText(turnType, modifier);
             document.getElementById('turnInstruction').textContent = instruction;
             document.getElementById('streetName').textContent = currentStep.name || 'Camino sin nombre';
-            
+
             // Show alert if close to turn
             const alertBanner = document.getElementById('alertBanner');
             const billboard = document.getElementById('turnBillboard');
-            
+
             if (minDist < 150 && turnType !== 'arrive' && turnType !== 'depart') {
                 // Mostrar cartel grande tipo Waze
                 showTurnBillboard(turnType, modifier, minDist, currentStep.name);
@@ -1322,7 +1394,7 @@
                 alertBanner.classList.add('hidden');
             }
         }
-        
+
         // Mostrar cartel grande de giro tipo Waze
         function showTurnBillboard(turnType, modifier, distance, streetName) {
             const billboard = document.getElementById('turnBillboard');
@@ -1330,18 +1402,18 @@
             const text = document.getElementById('billboardText');
             const distEl = document.getElementById('billboardDistance');
             const street = document.getElementById('billboardStreet');
-            
+
             // Determinar icono y texto
             const iconClass = getTurnIcon(turnType, modifier);
             const instruction = getInstructionText(turnType, modifier);
-            
+
             arrow.innerHTML = `<i class="fas ${iconClass}"></i>`;
             text.textContent = instruction;
-            distEl.textContent = distance > 1000 ? `${(distance/1000).toFixed(1)} km` : `${Math.round(distance)} m`;
+            distEl.textContent = distance > 1000 ? `${(distance / 1000).toFixed(1)} km` : `${Math.round(distance)} m`;
             street.textContent = streetName ? `hacia ${streetName}` : '';
-            
+
             billboard.classList.add('show');
-            
+
             // Ocultar después de 3 segundos si la distancia es mayor
             clearTimeout(billboardTimeout);
             if (distance > 200) {
@@ -1350,25 +1422,25 @@
                 }, 3000);
             }
         }
-        
+
         // Calcular bearing entre dos puntos
         function calculateBearing(start, end) {
             if (!start || !end) return 0;
-            
+
             const startLat = start.lat * Math.PI / 180;
             const startLng = start.lng * Math.PI / 180;
             const endLat = end.lat * Math.PI / 180;
             const endLng = end.lng * Math.PI / 180;
-            
+
             const dLng = endLng - startLng;
-            
+
             const x = Math.sin(dLng) * Math.cos(endLat);
             const y = Math.cos(startLat) * Math.sin(endLat) - Math.sin(startLat) * Math.cos(endLat) * Math.cos(dLng);
-            
+
             let bearing = Math.atan2(x, y) * 180 / Math.PI;
             return (bearing + 360) % 360;
         }
-        
+
         // Rotar el mapa según heading (desactivado - causa problemas de renderizado)
         function rotateMap(heading) {
             // El icono del vehículo ya rota, no necesitamos rotar el mapa
@@ -1389,7 +1461,7 @@
                 'arrive': 'fa-flag-checkered',
                 'depart': 'fa-play'
             };
-            
+
             if (modifier && icons[modifier]) return icons[modifier];
             if (icons[type]) return icons[type];
             return 'fa-arrow-up';
@@ -1414,7 +1486,7 @@
                 'new name': 'Continúa por',
                 'continue': 'Continúa recto'
             };
-            
+
             if (type === 'turn' && modifier) {
                 return instructions.turn[modifier] || 'Continúa';
             }
@@ -1426,7 +1498,7 @@
             showNotification('⚠️ Error de GPS. Verifica los permisos de ubicación.');
             document.getElementById('turnInstruction').textContent = 'Esperando señal GPS...';
             document.getElementById('turnDistance').textContent = '--';
-            
+
             // Reintentar obtener ubicación cada 5 segundos
             setTimeout(() => {
                 if (isNavigating) {
@@ -1443,7 +1515,7 @@
         function simulateNavigation() {
             let pointIndex = 0;
             let lastSimCoord = null;
-            
+
             const simulationInterval = setInterval(() => {
                 if (!isNavigating || pointIndex >= routeCoordinates.length) {
                     clearInterval(simulationInterval);
@@ -1453,10 +1525,10 @@
                     }
                     return;
                 }
-                
+
                 const coord = routeCoordinates[pointIndex];
                 const currentLatLng = L.latLng(coord[0], coord[1]);
-                
+
                 // Calcular heading basado en el siguiente punto
                 let simHeading = 0;
                 if (lastSimCoord) {
@@ -1465,7 +1537,7 @@
                     const nextCoord = routeCoordinates[pointIndex + 1];
                     simHeading = calculateBearing(currentLatLng, L.latLng(nextCoord[0], nextCoord[1]));
                 }
-                
+
                 const fakePosition = {
                     coords: {
                         latitude: coord[0],
@@ -1475,7 +1547,7 @@
                         heading: simHeading
                     }
                 };
-                
+
                 updateNavigation(fakePosition);
                 lastSimCoord = currentLatLng;
                 pointIndex += Math.floor(Math.random() * 2) + 1; // Avanzar 1-2 puntos
@@ -1485,33 +1557,33 @@
         // Stop navigation
         function stopNavigation() {
             isNavigating = false;
-            
+
             if (watchId) {
                 navigator.geolocation.clearWatch(watchId);
                 watchId = null;
             }
-            
+
             // Desactivar modo navegación
             const mapContainer = document.getElementById('map');
             mapContainer.classList.remove('navigation-mode');
-            
+
             // Ocultar cartel de giro
             document.getElementById('turnBillboard').classList.remove('show');
-            
+
             // Limpiar marcador de vehículo
             if (vehicleMarker) {
                 map.removeLayer(vehicleMarker);
                 vehicleMarker = null;
             }
-            
+
             // Restaurar zoom
             map.setZoom(14);
-            
+
             // Show planning UI, hide navigation UI
             document.getElementById('menuPanel').classList.remove('hidden');
             document.getElementById('fabContainer').classList.remove('hidden');
             document.getElementById('navMode').classList.add('hidden');
-            
+
             showNotification('🛑 Navegación finalizada');
         }
 
@@ -1530,19 +1602,19 @@
                 const firstStep = routeSteps[0];
                 document.getElementById('turnInstruction').textContent = 'Inicia el recorrido';
                 document.getElementById('streetName').textContent = firstStep.name || 'Ruta off-road';
-                document.getElementById('navRemaining').textContent = `${(totalDistance/1000).toFixed(1)} km`;
+                document.getElementById('navRemaining').textContent = `${(totalDistance / 1000).toFixed(1)} km`;
             }
         }
 
         function showNotification(message) {
             const existing = document.querySelector('.notification-toast');
             if (existing) existing.remove();
-            
+
             const notification = document.createElement('div');
             notification.className = 'notification-toast';
             notification.innerHTML = message;
             document.body.appendChild(notification);
-            
+
             // Animación de entrada
             notification.style.opacity = '0';
             notification.style.transform = 'translateY(20px)';
@@ -1551,7 +1623,7 @@
                 notification.style.opacity = '1';
                 notification.style.transform = 'translateY(0)';
             });
-            
+
             setTimeout(() => {
                 notification.style.opacity = '0';
                 notification.style.transform = 'translateY(20px)';
@@ -1564,7 +1636,7 @@
             if (markerB) map.removeLayer(markerB);
             if (routeLayer) map.removeLayer(routeLayer);
             if (userMarker) map.removeLayer(userMarker);
-            
+
             markerA = null;
             markerB = null;
             routeLayer = null;
@@ -1572,12 +1644,12 @@
             routeCoordinates = [];
             routeSteps = [];
             currentMode = 'A';
-            
+
             // Limpiar rutas alternativas
             allRoutes = [];
             currentRouteIndex = 0;
             lastRouteRequest = null;
-            
+
             // Clear search inputs
             searchInputA.value = '';
             searchInputB.value = '';
@@ -1585,7 +1657,7 @@
             clearSearchB.classList.add('hidden');
             resultsA.classList.remove('show');
             resultsB.classList.remove('show');
-            
+
             document.getElementById('routeInfo').classList.add('hidden');
             updateButtonStyles();
             showNotification('🗑️ Mapa limpiado');
@@ -1594,10 +1666,10 @@
         // ==========================================
         // SEARCH FUNCTIONALITY WITH AUTOCOMPLETE
         // ==========================================
-        
+
         let searchTimeoutA = null;
         let searchTimeoutB = null;
-        
+
         const searchInputA = document.getElementById('searchInputA');
         const searchInputB = document.getElementById('searchInputB');
         const resultsA = document.getElementById('resultsA');
@@ -1606,43 +1678,43 @@
         const clearSearchB = document.getElementById('clearSearchB');
         const loadingA = document.getElementById('loadingA');
         const loadingB = document.getElementById('loadingB');
-        
+
         // Search input A
         searchInputA.addEventListener('input', (e) => {
             const query = e.target.value.trim();
             clearTimeout(searchTimeoutA);
-            
+
             if (query.length < 3) {
                 resultsA.classList.remove('show');
                 clearSearchA.classList.add('hidden');
                 return;
             }
-            
+
             clearSearchA.classList.remove('hidden');
             loadingA.classList.remove('hidden');
             clearSearchA.classList.add('hidden');
-            
+
             searchTimeoutA = setTimeout(() => searchAddress(query, 'A'), 500);
         });
-        
+
         // Search input B
         searchInputB.addEventListener('input', (e) => {
             const query = e.target.value.trim();
             clearTimeout(searchTimeoutB);
-            
+
             if (query.length < 3) {
                 resultsB.classList.remove('show');
                 clearSearchB.classList.add('hidden');
                 return;
             }
-            
+
             clearSearchB.classList.remove('hidden');
             loadingB.classList.remove('hidden');
             clearSearchB.classList.add('hidden');
-            
+
             searchTimeoutB = setTimeout(() => searchAddress(query, 'B'), 500);
         });
-        
+
         // Clear buttons
         clearSearchA.addEventListener('click', () => {
             searchInputA.value = '';
@@ -1653,7 +1725,7 @@
                 markerA = null;
             }
         });
-        
+
         clearSearchB.addEventListener('click', () => {
             searchInputB.value = '';
             resultsB.classList.remove('show');
@@ -1663,13 +1735,13 @@
                 markerB = null;
             }
         });
-        
+
         // Search address using Nominatim
         async function searchAddress(query, point) {
             const resultsDiv = point === 'A' ? resultsA : resultsB;
             const loadingEl = point === 'A' ? loadingA : loadingB;
             const clearEl = point === 'A' ? clearSearchA : clearSearchB;
-            
+
             try {
                 const response = await fetch(
                     `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=5&addressdetails=1`,
@@ -1679,12 +1751,12 @@
                         }
                     }
                 );
-                
+
                 const data = await response.json();
-                
+
                 loadingEl.classList.add('hidden');
                 clearEl.classList.remove('hidden');
-                
+
                 if (data.length === 0) {
                     resultsDiv.innerHTML = `
                         <div class="search-result-item text-gray-400">
@@ -1695,7 +1767,7 @@
                     resultsDiv.classList.add('show');
                     return;
                 }
-                
+
                 resultsDiv.innerHTML = data.map((item, index) => `
                     <div class="search-result-item" data-lat="${item.lat}" data-lon="${item.lon}" data-name="${item.display_name}" data-point="${point}">
                         <i class="fas ${getPlaceIcon(item.type)}"></i>
@@ -1705,14 +1777,14 @@
                         </div>
                     </div>
                 `).join('');
-                
+
                 resultsDiv.classList.add('show');
-                
+
                 // Add click handlers to results
                 resultsDiv.querySelectorAll('.search-result-item[data-lat]').forEach(item => {
                     item.addEventListener('click', () => selectSearchResult(item));
                 });
-                
+
             } catch (error) {
                 console.error('Search error:', error);
                 loadingEl.classList.add('hidden');
@@ -1726,7 +1798,7 @@
                 resultsDiv.classList.add('show');
             }
         }
-        
+
         function getPlaceIcon(type) {
             const icons = {
                 'city': 'fa-city',
@@ -1751,7 +1823,7 @@
             };
             return icons[type] || 'fa-map-marker-alt';
         }
-        
+
         function getShortName(item) {
             if (item.address) {
                 if (item.address.road) return item.address.road;
@@ -1762,27 +1834,27 @@
             }
             return item.display_name.split(',')[0];
         }
-        
+
         function selectSearchResult(item) {
             const lat = parseFloat(item.dataset.lat);
             const lon = parseFloat(item.dataset.lon);
             const name = item.dataset.name;
             const point = item.dataset.point;
-            
+
             const latlng = L.latLng(lat, lon);
-            
+
             if (point === 'A') {
                 if (markerA) map.removeLayer(markerA);
                 markerA = L.marker(latlng, {
                     icon: createMarkerIcon('A', '#22c55e'),
                     draggable: true
                 }).addTo(map);
-                markerA.bindPopup(`<b>Inicio:</b><br>${name.split(',').slice(0,2).join(',')}`);
-                
-                searchInputA.value = getShortName({display_name: name, address: null});
+                markerA.bindPopup(`<b>Inicio:</b><br>${name.split(',').slice(0, 2).join(',')}`);
+
+                searchInputA.value = getShortName({ display_name: name, address: null });
                 resultsA.classList.remove('show');
                 clearSearchA.classList.remove('hidden');
-                
+
                 // Auto-focus to point B
                 searchInputB.focus();
             } else {
@@ -1791,23 +1863,23 @@
                     icon: createMarkerIcon('B', '#ef4444'),
                     draggable: true
                 }).addTo(map);
-                markerB.bindPopup(`<b>Destino:</b><br>${name.split(',').slice(0,2).join(',')}`);
-                
-                searchInputB.value = getShortName({display_name: name, address: null});
+                markerB.bindPopup(`<b>Destino:</b><br>${name.split(',').slice(0, 2).join(',')}`);
+
+                searchInputB.value = getShortName({ display_name: name, address: null });
                 resultsB.classList.remove('show');
                 clearSearchB.classList.remove('hidden');
             }
-            
+
             // Zoom to marker
             map.setView(latlng, 14);
-            
+
             // If both markers exist, fit bounds
             if (markerA && markerB) {
                 const group = L.featureGroup([markerA, markerB]);
                 map.fitBounds(group.getBounds(), { padding: [50, 50] });
             }
         }
-        
+
         // Close search results when clicking outside
         document.addEventListener('click', (e) => {
             if (!e.target.closest('.search-container')) {
@@ -1815,24 +1887,24 @@
                 resultsB.classList.remove('show');
             }
         });
-        
+
         // Use current location as start point
         document.getElementById('btnLocate').addEventListener('click', () => {
             if ('geolocation' in navigator) {
                 navigator.geolocation.getCurrentPosition(
                     (position) => {
                         const latlng = L.latLng(position.coords.latitude, position.coords.longitude);
-                        
+
                         if (markerA) map.removeLayer(markerA);
                         markerA = L.marker(latlng, {
                             icon: createMarkerIcon('A', '#22c55e'),
                             draggable: true
                         }).addTo(map);
                         markerA.bindPopup('<b>Tu ubicación actual</b>');
-                        
+
                         searchInputA.value = '📍 Mi ubicación actual';
                         clearSearchA.classList.remove('hidden');
-                        
+
                         map.setView(latlng, 15);
                         showNotification('📍 Ubicación establecida como punto de inicio');
                     },
@@ -1849,7 +1921,7 @@
         updateRouteTypeButtons();
 
         // Geolocation events
-        map.on('locationfound', function(e) {
+        map.on('locationfound', function (e) {
             if (!isNavigating && !userMarker) {
                 userMarker = L.marker(e.latlng, {
                     icon: createUserIcon()
@@ -1857,14 +1929,14 @@
             }
         });
 
-        map.on('locationerror', function(e) {
+        map.on('locationerror', function (e) {
             showNotification('📍 No se pudo obtener tu ubicación');
         });
 
         // Register Service Worker for PWA
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js')
+                navigator.serviceWorker.register('./sw.js')
                     .then(registration => {
                         console.log('SW registered:', registration.scope);
                     })
@@ -1875,7 +1947,7 @@
         }
 
         // Prevent pull-to-refresh on mobile
-        document.body.addEventListener('touchmove', function(e) {
+        document.body.addEventListener('touchmove', function (e) {
             if (e.target.closest('#map')) return;
             e.preventDefault();
         }, { passive: false });
@@ -1901,4 +1973,5 @@
         }
     </script>
 </body>
+
 </html>
