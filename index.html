@@ -198,6 +198,22 @@
             transition: transform 0.3s ease;
         }
 
+        /* Mobile adjustments */
+        @media (max-width: 768px) {
+
+            html,
+            body {
+                height: 100%;
+                overscroll-behavior: auto;
+                touch-action: auto;
+            }
+
+            .menu-panel {
+                overflow-y: scroll;
+                height: calc(100dvh - 70px);
+            }
+        }
+
         .menu-panel.collapsed {
             transform: translateY(calc(100% - 70px));
         }
