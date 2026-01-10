@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generar Iconos PWA - Enduro GPS</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #111827;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        h1 { color: #f97316; }
+        .icons { display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; margin: 20px 0; }
+        .icon-box { background: #1f2937; padding: 20px; border-radius: 10px; }
+        canvas { display: block; margin: 10px auto; border: 2px solid #f97316; border-radius: 10px; }
+        button {
+            background: #f97316;
+            color: #111827;
+            border: none;
+            padding: 15px 30px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 10px;
+            cursor: pointer;
+            margin: 10px;
+        }
+        button:hover { background: #fb923c; }
+        .instructions {
+            background: #1f2937;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px auto;
+            max-width: 600px;
+            text-align: left;
+        }
+        .instructions h2 { color: #f97316; }
+        .instructions ol { line-height: 1.8; }
+        code { background: #374151; padding: 2px 8px; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <h1>🏍️ Generar Iconos PWA - Enduro GPS</h1>
+    
+    <div class="icons">
+        <div class="icon-box">
+            <h3>icon-192.png</h3>
+            <canvas id="icon192" width="192" height="192"></canvas>
+            <button onclick="download('icon192', 'icon-192.png')">⬇️ Descargar</button>
+        </div>
+        <div class="icon-box">
+            <h3>icon-512.png</h3>
+            <canvas id="icon512" width="512" height="512"></canvas>
+            <button onclick="download('icon512', 'icon-512.png')">⬇️ Descargar</button>
+        </div>
+        <div class="icon-box">
+            <h3>icon-maskable-192.png</h3>
+            <canvas id="iconMask192" width="192" height="192"></canvas>
+            <button onclick="download('iconMask192', 'icon-maskable-192.png')">⬇️ Descargar</button>
+        </div>
+        <div class="icon-box">
+            <h3>icon-maskable-512.png</h3>
+            <canvas id="iconMask512" width="512" height="512"></canvas>
+            <button onclick="download('iconMask512', 'icon-maskable-512.png')">⬇️ Descargar</button>
+        </div>
+    </div>
+
+    <button onclick="downloadAll()" style="font-size: 20px; padding: 20px 40px;">
+        📦 DESCARGAR TODOS
+    </button>
+
+    <div class="instructions">
+        <h2>📋 Instrucciones:</h2>
+        <ol>
+            <li>Pulsa <strong>"DESCARGAR TODOS"</strong> para bajar los 4 iconos</li>
+            <li>Sube los 4 archivos PNG a tu repositorio GitHub:
+                <ul>
+                    <li><code>icon-192.png</code></li>
+                    <li><code>icon-512.png</code></li>
+                    <li><code>icon-maskable-192.png</code></li>
+                    <li><code>icon-maskable-512.png</code></li>
+                </ul>
+            </li>
+            <li>¡Ya tienes tu PWA lista para Android! 🎉</li>
+        </ol>
+        <h2>🤖 Para instalar en Android:</h2>
+        <ol>
+            <li>Abre Chrome en Android</li>
+            <li>Ve a: <code>https://rjerezso.github.io/gpsEnduro/</code></li>
+            <li>Pulsa menú ⋮ → <strong>"Instalar aplicación"</strong></li>
+            <li>¡Listo! Tendrás el icono en tu pantalla de inicio</li>
+        </ol>
+    </div>
+
+    <script>
+        function drawIcon(ctx, size, maskable = false) {
+            const scale = size / 512;
+            
+            // Fondo
+            if (maskable) {
+                // Maskable: fondo completo sin bordes redondeados
+                ctx.fillStyle = '#111827';
+                ctx.fillRect(0, 0, size, size);
+            } else {
+                // Normal: fondo con esquinas redondeadas
+                ctx.fillStyle = '#111827';
+                ctx.beginPath();
+                const radius = 64 * scale;
+                ctx.roundRect(0, 0, size, size, radius);
+                ctx.fill();
+            }
+            
+            const centerX = size / 2;
+            const centerY = size * 0.52;
+            
+            // Círculo exterior (brújula)
+            ctx.strokeStyle = '#f97316';
+            ctx.lineWidth = 24 * scale;
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, 130 * scale, 0, Math.PI * 2);
+            ctx.stroke();
+            
+            // Círculo interior
+            ctx.fillStyle = '#f97316';
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, 55 * scale, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Flecha norte (triángulo)
+            ctx.fillStyle = '#f97316';
+            ctx.beginPath();
+            ctx.moveTo(centerX, size * 0.16);
+            ctx.lineTo(centerX + 22 * scale, size * 0.28);
+            ctx.lineTo(centerX - 22 * scale, size * 0.28);
+            ctx.closePath();
+            ctx.fill();
+            
+            // Texto "ENDURO"
+            ctx.fillStyle = '#ffffff';
+            ctx.font = `bold ${42 * scale}px Arial`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('ENDURO', centerX, size * 0.88);
+        }
+        
+        // Dibujar todos los iconos
+        function generateIcons() {
+            const sizes = [
+                { id: 'icon192', size: 192, maskable: false },
+                { id: 'icon512', size: 512, maskable: false },
+                { id: 'iconMask192', size: 192, maskable: true },
+                { id: 'iconMask512', size: 512, maskable: true }
+            ];
+            
+            sizes.forEach(({ id, size, maskable }) => {
+                const canvas = document.getElementById(id);
+                const ctx = canvas.getContext('2d');
+                drawIcon(ctx, size, maskable);
+            });
+        }
+        
+        // Descargar un icono
+        function download(canvasId, filename) {
+            const canvas = document.getElementById(canvasId);
+            const link = document.createElement('a');
+            link.download = filename;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
+        
+        // Descargar todos
+        function downloadAll() {
+            download('icon192', 'icon-192.png');
+            setTimeout(() => download('icon512', 'icon-512.png'), 300);
+            setTimeout(() => download('iconMask192', 'icon-maskable-192.png'), 600);
+            setTimeout(() => download('iconMask512', 'icon-maskable-512.png'), 900);
+        }
+        
+        // Generar al cargar
+        generateIcons();
+    </script>
+</body>
+</html>

@@ -3,31 +3,49 @@
   "short_name": "EnduroGPS",
   "description": "GPS Off-Road para rutas de enduro - Evita asfalto, busca caminos de tierra",
   "start_url": "./index.html",
+  "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#111827",
   "theme_color": "#f97316",
-  "id": "com.enduro.gps",
+  "id": "/gpsEnduro/",
   "icons": [
     {
-      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect fill='%23111827' width='512' height='512' rx='64'/><circle cx='256' cy='280' r='140' fill='none' stroke='%23f97316' stroke-width='24'/><circle cx='256' cy='280' r='60' fill='%23f97316'/><polygon points='256,80 276,140 236,140' fill='%23f97316'/><text x='256' y='460' text-anchor='middle' fill='%23fff' font-size='48' font-family='Arial' font-weight='bold'>ENDURO</text></svg>",
-      "sizes": "512x512",
-      "type": "image/svg+xml",
-      "purpose": "any maskable"
+      "src": "./icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
     },
     {
-      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect fill='%23111827' width='192' height='192' rx='24'/><circle cx='96' cy='105' r='52' fill='none' stroke='%23f97316' stroke-width='10'/><circle cx='96' cy='105' r='22' fill='%23f97316'/><polygon points='96,30 106,52 86,52' fill='%23f97316'/></svg>",
+      "src": "./icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icon-maskable-192.png",
       "sizes": "192x192",
-      "type": "image/svg+xml",
-      "purpose": "any maskable"
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "./icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ],
   "categories": ["navigation", "sports"],
   "lang": "es",
   "dir": "ltr",
-  "scope": "./",
-  "permissions": [
-    "geolocation"
-  ],
-  "prefer_related_applications": false
+  "prefer_related_applications": false,
+  "shortcuts": [
+    {
+      "name": "Nueva Ruta",
+      "short_name": "Ruta",
+      "description": "Planificar nueva ruta off-road",
+      "url": "./index.html",
+      "icons": [{ "src": "./icon-192.png", "sizes": "192x192" }]
+    }
+  ]
 }
