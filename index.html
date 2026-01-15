@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Enduro Route Planner - GPS Off-Road</title>
-    
+
     <!-- PWA Meta Tags -->
     <meta name="description" content="GPS Off-Road para rutas de enduro - Evita asfalto, busca caminos de tierra">
     <meta name="theme-color" content="#f97316">
@@ -14,14 +15,16 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="msapplication-TileColor" content="#111827">
     <meta name="msapplication-tap-highlight" content="no">
-    
+
     <!-- Manifest -->
     <link rel="manifest" href="./manifest.json">
-    
+
     <!-- Icons -->
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect fill='%23111827' width='512' height='512' rx='64'/><circle cx='256' cy='280' r='140' fill='none' stroke='%23f97316' stroke-width='24'/><circle cx='256' cy='280' r='60' fill='%23f97316'/><polygon points='256,80 276,140 236,140' fill='%23f97316'/></svg>">
-    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect fill='%23111827' width='512' height='512' rx='64'/><circle cx='256' cy='280' r='140' fill='none' stroke='%23f97316' stroke-width='24'/><circle cx='256' cy='280' r='60' fill='%23f97316'/><polygon points='256,80 276,140 236,140' fill='%23f97316'/></svg>">
-    
+    <link rel="icon" type="image/svg+xml"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect fill='%23111827' width='512' height='512' rx='64'/><circle cx='256' cy='280' r='140' fill='none' stroke='%23f97316' stroke-width='24'/><circle cx='256' cy='280' r='60' fill='%23f97316'/><polygon points='256,80 276,140 236,140' fill='%23f97316'/></svg>">
+    <link rel="apple-touch-icon"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect fill='%23111827' width='512' height='512' rx='64'/><circle cx='256' cy='280' r='140' fill='none' stroke='%23f97316' stroke-width='24'/><circle cx='256' cy='280' r='60' fill='%23f97316'/><polygon points='256,80 276,140 236,140' fill='%23f97316'/></svg>">
+
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -31,32 +34,36 @@
             -webkit-tap-highlight-color: transparent;
             -webkit-touch-callout: none;
         }
-        
-        html, body {
+
+        html,
+        body {
             touch-action: manipulation;
             overscroll-behavior: none;
         }
-        
-        #map { 
-            height: 100vh; 
+
+        #map {
+            height: 100vh;
             height: 100dvh;
-            width: 100%; 
+            width: 100%;
             position: fixed !important;
             top: 0;
             left: 0;
             z-index: 1;
         }
-        .leaflet-container { 
+
+        .leaflet-container {
             font-family: inherit;
             background: #1a1a2e !important;
         }
+
         .leaflet-tile-pane {
             z-index: 2 !important;
         }
+
         .leaflet-control-zoom {
             display: none !important;
         }
-        
+
         .custom-marker {
             width: 40px;
             height: 40px;
@@ -68,9 +75,9 @@
             font-weight: bold;
             font-size: 18px;
             border: 4px solid white;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
         }
-        
+
         /* Marcador de vehículo tipo flecha/moto */
         .vehicle-marker {
             width: 70px;
@@ -78,13 +85,14 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            filter: drop-shadow(0 6px 12px rgba(0,0,0,0.6));
+            filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.6));
         }
+
         .vehicle-icon-svg {
             width: 70px;
             height: 70px;
         }
-        
+
         .user-marker {
             width: 28px;
             height: 28px;
@@ -94,11 +102,19 @@
             box-shadow: 0 0 20px rgba(59, 130, 246, 0.8);
             animation: pulse 2s infinite;
         }
+
         @keyframes pulse {
-            0%, 100% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.8); }
-            50% { box-shadow: 0 0 40px rgba(59, 130, 246, 1); }
+
+            0%,
+            100% {
+                box-shadow: 0 0 20px rgba(59, 130, 246, 0.8);
+            }
+
+            50% {
+                box-shadow: 0 0 40px rgba(59, 130, 246, 1);
+            }
         }
-        
+
         /* Indicador de giro compacto - NO tapa el mapa */
         .turn-billboard {
             position: fixed;
@@ -110,41 +126,53 @@
             border-radius: 16px;
             padding: 12px 24px;
             text-align: center;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.6);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
             transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
             display: flex;
             align-items: center;
             gap: 12px;
         }
+
         .turn-billboard.show {
             transform: translateX(-50%) scale(1);
         }
+
         .turn-billboard .turn-arrow {
             font-size: 36px;
             color: white;
-            text-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
         }
+
         .turn-billboard .turn-info {
             text-align: left;
         }
+
         .turn-billboard .turn-text {
             font-size: 16px;
             font-weight: bold;
             color: white;
         }
+
         .turn-billboard .turn-distance {
             font-size: 24px;
             font-weight: bold;
             color: #fef3c7;
         }
+
         .turn-billboard .turn-street {
             display: none;
         }
+
         @keyframes bounce-turn {
-            from { transform: scale(1); }
-            to { transform: scale(1.1); }
+            from {
+                transform: scale(1);
+            }
+
+            to {
+                transform: scale(1.1);
+            }
         }
-        
+
         /* MENÚ MÓVIL OPTIMIZADO - COMPACTO */
         .menu-panel {
             position: fixed;
@@ -158,12 +186,14 @@
             padding: 8px 12px 16px;
             padding-bottom: max(16px, env(safe-area-inset-bottom));
             border-top: 3px solid #f97316;
-            box-shadow: 0 -10px 40px rgba(0,0,0,0.7);
+            box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.7);
             transition: transform 0.3s ease;
         }
+
         .menu-panel.collapsed {
             transform: translateY(calc(100% - 50px));
         }
+
         .menu-handle {
             width: 40px;
             height: 4px;
@@ -171,7 +201,7 @@
             border-radius: 2px;
             margin: 0 auto 8px;
         }
-        
+
         /* NAVEGACIÓN MÓVIL */
         .nav-panel {
             position: fixed;
@@ -185,6 +215,7 @@
             padding-top: max(12px, env(safe-area-inset-top));
             border-bottom: 3px solid #f97316;
         }
+
         .nav-bottom {
             position: fixed;
             bottom: 0;
@@ -197,6 +228,7 @@
             padding-bottom: max(16px, env(safe-area-inset-bottom));
             border-top: 2px solid #374151;
         }
+
         .turn-icon {
             width: 56px;
             height: 56px;
@@ -210,6 +242,7 @@
             color: white;
             box-shadow: 0 4px 15px rgba(249, 115, 22, 0.4);
         }
+
         .speed-display {
             width: 70px;
             height: 70px;
@@ -222,22 +255,25 @@
             align-items: center;
             justify-content: center;
         }
+
         .progress-bar {
             height: 8px;
             background: #374151;
             border-radius: 4px;
             overflow: hidden;
         }
+
         .progress-fill {
             height: 100%;
             background: linear-gradient(90deg, #f97316, #fbbf24);
             transition: width 0.5s ease;
         }
-        
+
         /* BÚSQUEDA MÓVIL */
         .search-container {
             position: relative;
         }
+
         .search-results {
             position: absolute;
             top: 100%;
@@ -252,9 +288,11 @@
             z-index: 1002;
             display: none;
         }
+
         .search-results.show {
             display: block;
         }
+
         .search-result-item {
             padding: 14px 16px;
             cursor: pointer;
@@ -265,17 +303,21 @@
             gap: 12px;
             -webkit-tap-highlight-color: rgba(249, 115, 22, 0.3);
         }
+
         .search-result-item:last-child {
             border-bottom: none;
         }
+
         .search-result-item:active {
             background: #374151;
         }
+
         .search-result-item i {
             color: #f97316;
             margin-top: 3px;
             font-size: 18px;
         }
+
         .search-input {
             width: 100%;
             background: #111827;
@@ -287,14 +329,17 @@
             transition: all 0.2s;
             -webkit-appearance: none;
         }
+
         .search-input:focus {
             outline: none;
             border-color: #f97316;
             box-shadow: 0 0 10px rgba(249, 115, 22, 0.3);
         }
+
         .search-input::placeholder {
             color: #6b7280;
         }
+
         .search-icon {
             position: absolute;
             left: 10px;
@@ -303,6 +348,7 @@
             pointer-events: none;
             font-size: 12px;
         }
+
         .search-clear {
             position: absolute;
             right: 8px;
@@ -313,9 +359,11 @@
             padding: 4px;
             font-size: 14px;
         }
+
         .search-clear:active {
             color: white;
         }
+
         .search-loading {
             position: absolute;
             right: 14px;
@@ -324,7 +372,7 @@
             color: #f97316;
             font-size: 18px;
         }
-        
+
         /* BOTONES MÓVIL - COMPACTOS */
         .btn-mobile {
             min-height: 40px;
@@ -338,29 +386,34 @@
             transition: all 0.15s;
             -webkit-tap-highlight-color: transparent;
         }
+
         .btn-mobile:active {
             transform: scale(0.97);
             opacity: 0.9;
         }
+
         .btn-primary {
             background: linear-gradient(135deg, #f59e0b, #d97706);
             color: #111827;
             box-shadow: 0 2px 10px rgba(245, 158, 11, 0.4);
         }
+
         .btn-success {
             background: linear-gradient(135deg, #22c55e, #16a34a);
             color: white;
             box-shadow: 0 2px 10px rgba(34, 197, 94, 0.4);
         }
+
         .btn-danger {
             background: linear-gradient(135deg, #ef4444, #dc2626);
             color: white;
         }
+
         .btn-secondary {
             background: #374151;
             color: white;
         }
-        
+
         /* FAB BUTTONS */
         .fab-container {
             position: fixed;
@@ -371,6 +424,7 @@
             flex-direction: column;
             gap: 8px;
         }
+
         .fab {
             width: 44px;
             height: 44px;
@@ -379,13 +433,14 @@
             align-items: center;
             justify-content: center;
             font-size: 18px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
             -webkit-tap-highlight-color: transparent;
         }
+
         .fab:active {
             transform: scale(0.93);
         }
-        
+
         /* INFO CARDS */
         .info-card {
             background: #1f2937;
@@ -393,21 +448,24 @@
             padding: 12px;
             text-align: center;
         }
+
         .info-card i {
             font-size: 20px;
             color: #f97316;
             margin-bottom: 4px;
         }
+
         .info-card .value {
             font-size: 18px;
             font-weight: bold;
         }
+
         .info-card .label {
             font-size: 11px;
             color: #9ca3af;
             text-transform: uppercase;
         }
-        
+
         /* NOTIFICATION TOAST */
         .notification-toast {
             position: fixed;
@@ -419,25 +477,27 @@
             color: white;
             padding: 16px;
             border-radius: 14px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
             z-index: 3000;
             text-align: center;
             font-size: 15px;
             font-weight: 500;
         }
-        
+
         /* Esconder scrollbar pero permitir scroll */
         .menu-panel::-webkit-scrollbar {
             width: 0;
             display: none;
         }
-        
+
         /* Modo oscuro para inputs */
-        input, select {
+        input,
+        select {
             color-scheme: dark;
         }
     </style>
 </head>
+
 <body class="bg-gray-900 text-white m-0 p-0" style="overflow: hidden; position: fixed; width: 100%; height: 100dvh;">
     <!-- Map Container -->
     <div id="map"></div>
@@ -459,7 +519,7 @@
     <div class="menu-panel" id="menuPanel">
         <!-- Handle para arrastrar -->
         <div class="menu-handle" id="menuHandle"></div>
-        
+
         <!-- Header compacto -->
         <div class="flex items-center gap-2 mb-2">
             <i class="fas fa-motorcycle text-2xl text-orange-500"></i>
@@ -475,7 +535,8 @@
                 <!-- ORIGEN -->
                 <div class="search-container">
                     <i class="fas fa-circle text-green-500 search-icon text-xs"></i>
-                    <input type="text" id="searchInputA" class="search-input text-sm py-2 pl-8 pr-8" placeholder="Origen..." autocomplete="off">
+                    <input type="text" id="searchInputA" class="search-input text-sm py-2 pl-8 pr-8"
+                        placeholder="Origen..." autocomplete="off">
                     <i class="fas fa-times search-clear" id="clearSearchA" style="display:none;"></i>
                     <i class="fas fa-spinner fa-spin search-loading" id="loadingA" style="display:none;"></i>
                     <div class="search-results" id="resultsA"></div>
@@ -483,7 +544,8 @@
                 <!-- DESTINO -->
                 <div class="search-container">
                     <i class="fas fa-flag-checkered text-red-500 search-icon text-xs"></i>
-                    <input type="text" id="searchInputB" class="search-input text-sm py-2 pl-8 pr-8" placeholder="Destino..." autocomplete="off">
+                    <input type="text" id="searchInputB" class="search-input text-sm py-2 pl-8 pr-8"
+                        placeholder="Destino..." autocomplete="off">
                     <i class="fas fa-times search-clear" id="clearSearchB" style="display:none;"></i>
                     <i class="fas fa-spinner fa-spin search-loading" id="loadingB" style="display:none;"></i>
                     <div class="search-results" id="resultsB"></div>
@@ -506,7 +568,8 @@
                         <i class="fas fa-road"></i>
                     </button>
                 </div>
-                <select id="mapType" class="bg-gray-800 border border-gray-600 rounded-lg px-1 py-2 text-xs focus:outline-none">
+                <select id="mapType"
+                    class="bg-gray-800 border border-gray-600 rounded-lg px-1 py-2 text-xs focus:outline-none">
                     <option value="cyclosm">🏍️</option>
                     <option value="mtb">🚵</option>
                     <option value="topo">⛰️</option>
@@ -530,13 +593,15 @@
                     <i class="fas fa-trash"></i>
                 </button>
             </div>
-            
+
             <!-- Rutas Guardadas -->
             <div id="savedRoutesPanel" class="hidden mb-2">
                 <div class="bg-gray-800 rounded-xl p-2">
                     <div class="flex items-center justify-between mb-2">
-                        <span class="text-sm font-bold text-orange-400"><i class="fas fa-bookmark mr-1"></i> Rutas Guardadas</span>
-                        <button id="closeSavedRoutes" class="text-gray-400 text-sm"><i class="fas fa-times"></i></button>
+                        <span class="text-sm font-bold text-orange-400"><i class="fas fa-bookmark mr-1"></i> Rutas
+                            Guardadas</span>
+                        <button id="closeSavedRoutes" class="text-gray-400 text-sm"><i
+                                class="fas fa-times"></i></button>
                     </div>
                     <div id="savedRoutesList" class="max-h-32 overflow-y-auto space-y-1"></div>
                 </div>
@@ -579,7 +644,7 @@
                 <div class="turn-icon" id="turnIcon">
                     <i class="fas fa-arrow-up"></i>
                 </div>
-                
+
                 <!-- Turn Instructions -->
                 <div class="flex-1 min-w-0">
                     <p class="text-2xl font-bold text-orange-400" id="turnDistance">--</p>
@@ -588,7 +653,8 @@
                 </div>
 
                 <!-- Close Button -->
-                <button id="btnCloseNav" class="w-12 h-12 min-w-12 bg-red-600 active:bg-red-500 rounded-full flex items-center justify-center shadow-lg">
+                <button id="btnCloseNav"
+                    class="w-12 h-12 min-w-12 bg-red-600 active:bg-red-500 rounded-full flex items-center justify-center shadow-lg">
                     <i class="fas fa-times text-xl"></i>
                 </button>
             </div>
@@ -623,32 +689,23 @@
                 </div>
 
                 <!-- Center on Me Button -->
-                <button id="btnCenterMe" class="w-14 h-14 min-w-14 bg-gray-700 active:bg-gray-600 rounded-full flex items-center justify-center shadow-lg">
+                <button id="btnCenterMe"
+                    class="w-14 h-14 min-w-14 bg-gray-700 active:bg-gray-600 rounded-full flex items-center justify-center shadow-lg">
                     <i class="fas fa-location-arrow text-xl text-orange-400"></i>
                 </button>
-                
+
 
             </div>
-            
+
 
 
             <!-- Alert Banner -->
-            <div id="alertBanner" class="hidden mt-3 bg-gradient-to-r from-orange-600 to-amber-500 rounded-xl p-4 flex items-center gap-3 animate-pulse">
+            <div id="alertBanner"
+                class="hidden mt-3 bg-gradient-to-r from-orange-600 to-amber-500 rounded-xl p-4 flex items-center gap-3 animate-pulse">
                 <i class="fas fa-exclamation-triangle text-2xl"></i>
                 <span class="font-bold text-base" id="alertText">¡Prepárate para girar!</span>
             </div>
-            
-            <!-- Demo Mode Button -->
-            <button id="btnDemoMode" class="mt-3 w-full btn-mobile bg-purple-600 py-3 text-white">
-                <i class="fas fa-play-circle"></i>
-                Modo Demo (simular recorrido)
-            </button>
-            
-            <!-- Stop Demo Button (hidden by default) -->
-            <button id="btnStopDemo" class="hidden mt-2 w-full btn-mobile bg-red-600 py-3 text-white">
-                <i class="fas fa-stop-circle"></i>
-                DETENER Demo
-            </button>
+
         </div>
     </div>
 
@@ -756,7 +813,7 @@
                 iconAnchor: [12, 12]
             });
         }
-        
+
         // Crear icono de vehículo con flecha direccional para navegación (tipo moto/GPS)
         function createVehicleIcon(heading = 0) {
             return L.divIcon({
@@ -779,16 +836,16 @@
                 iconAnchor: [35, 35]
             });
         }
-        
+
         // Variables para la navegación avanzada
         let currentHeading = 0;
         let lastHeading = 0;
         let mapRotation = 0;
         let vehicleMarker = null;
         let billboardTimeout = null;
-        
 
-        
+
+
         // ==========================================
         // GUARDAR Y CARGAR RUTAS
         // ==========================================
@@ -797,12 +854,12 @@
                 showNotification('⚠️ Primero calcula una ruta');
                 return;
             }
-            
+
             const routeName = prompt('Nombre para la ruta:', `Ruta ${new Date().toLocaleDateString('es-ES')}`);
             if (!routeName) return;
-            
+
             const savedRoutes = JSON.parse(localStorage.getItem('enduroRoutes') || '[]');
-            
+
             const routeData = {
                 id: Date.now(),
                 name: routeName,
@@ -815,21 +872,21 @@
                 distance: totalDistance,
                 routeType: routeType
             };
-            
+
             savedRoutes.unshift(routeData);
-            
+
             // Máximo 20 rutas guardadas
             if (savedRoutes.length > 20) savedRoutes.pop();
-            
+
             localStorage.setItem('enduroRoutes', JSON.stringify(savedRoutes));
             showNotification(`💾 Ruta "${routeName}" guardada`);
         }
-        
+
         function loadSavedRoutes() {
             const savedRoutes = JSON.parse(localStorage.getItem('enduroRoutes') || '[]');
             const panel = document.getElementById('savedRoutesPanel');
             const list = document.getElementById('savedRoutesList');
-            
+
             if (savedRoutes.length === 0) {
                 list.innerHTML = '<p class="text-gray-400 text-xs text-center py-2">No hay rutas guardadas</p>';
             } else {
@@ -838,7 +895,7 @@
                         <div class="flex-1 min-w-0">
                             <p class="text-white text-sm font-medium truncate">${route.name}</p>
                             <p class="text-gray-400 text-xs truncate">${route.startName} → ${route.endName}</p>
-                            <p class="text-gray-500 text-xs">${(route.distance/1000).toFixed(1)} km</p>
+                            <p class="text-gray-500 text-xs">${(route.distance / 1000).toFixed(1)} km</p>
                         </div>
                         <button onclick="loadRoute(${route.id})" class="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center">
                             <i class="fas fa-play text-xs"></i>
@@ -849,49 +906,49 @@
                     </div>
                 `).join('');
             }
-            
+
             panel.classList.toggle('hidden');
         }
-        
+
         function loadRoute(routeId) {
             const savedRoutes = JSON.parse(localStorage.getItem('enduroRoutes') || '[]');
             const route = savedRoutes.find(r => r.id === routeId);
-            
+
             if (!route) {
                 showNotification('⚠️ Ruta no encontrada');
                 return;
             }
-            
+
             // Limpiar ruta actual
             if (markerA) map.removeLayer(markerA);
             if (markerB) map.removeLayer(markerB);
             if (routeLayer) map.removeLayer(routeLayer);
-            
+
             // Crear marcadores
             const startLatLng = L.latLng(route.startCoords.lat, route.startCoords.lng);
             const endLatLng = L.latLng(route.endCoords.lat, route.endCoords.lng);
-            
+
             markerA = L.marker(startLatLng, {
                 icon: createMarkerIcon('A', '#22c55e'),
                 draggable: true
             }).addTo(map);
-            
+
             markerB = L.marker(endLatLng, {
                 icon: createMarkerIcon('B', '#ef4444'),
                 draggable: true
             }).addTo(map);
-            
+
             // Actualizar inputs
             searchInputA.value = route.startName;
             searchInputB.value = route.endName;
             clearSearchA.style.display = 'block';
             clearSearchB.style.display = 'block';
-            
+
             // Cargar ruta
             routeCoordinates = route.coordinates;
             totalDistance = route.distance;
             routeType = route.routeType || 'offroad';
-            
+
             // Dibujar ruta
             const geoJsonCoords = routeCoordinates.map(c => [c[1], c[0]]);
             routeLayer = L.polyline(routeCoordinates, {
@@ -900,34 +957,34 @@
                 opacity: 0.85,
                 dashArray: routeType === 'offroad' ? '12, 8' : null
             }).addTo(map);
-            
+
             map.fitBounds(routeLayer.getBounds(), { padding: [50, 50] });
-            
+
             // Mostrar info
-            document.getElementById('distance').textContent = `${(totalDistance/1000).toFixed(1)} km`;
+            document.getElementById('distance').textContent = `${(totalDistance / 1000).toFixed(1)} km`;
             document.getElementById('routeInfo').classList.remove('hidden');
             document.getElementById('savedRoutesPanel').classList.add('hidden');
-            
+
             showNotification(`✅ Ruta "${route.name}" cargada`);
         }
-        
+
         function deleteRoute(routeId) {
             if (!confirm('¿Eliminar esta ruta?')) return;
-            
+
             let savedRoutes = JSON.parse(localStorage.getItem('enduroRoutes') || '[]');
             savedRoutes = savedRoutes.filter(r => r.id !== routeId);
             localStorage.setItem('enduroRoutes', JSON.stringify(savedRoutes));
-            
+
             loadSavedRoutes();
             showNotification('🗑️ Ruta eliminada');
         }
-        
+
         document.getElementById('btnSaveRoute').addEventListener('click', saveRoute);
         document.getElementById('btnSaveRoute').addEventListener('click', saveRoute);
         document.getElementById('closeSavedRoutes').addEventListener('click', () => {
             document.getElementById('savedRoutesPanel').classList.add('hidden');
         });
-        
+
         // Long press para ver rutas guardadas
         let saveButtonTimer;
         document.getElementById('btnSaveRoute').addEventListener('touchstart', () => {
@@ -941,7 +998,7 @@
                 loadSavedRoutes();
             }
         });
-        
+
         // ==========================================
         // EXPORTAR GPX
         // ==========================================
@@ -950,10 +1007,10 @@
                 showNotification('⚠️ Primero calcula una ruta');
                 return;
             }
-            
+
             const now = new Date().toISOString();
             const routeName = `Enduro_${new Date().toLocaleDateString('es-ES').replace(/\//g, '-')}`;
-            
+
             let gpx = `<?xml version="1.0" encoding="UTF-8"?>
 <gpx version="1.1" creator="Enduro Route Planner"
      xmlns="http://www.topografix.com/GPX/1/1"
@@ -969,20 +1026,20 @@
     <type>${routeType === 'offroad' ? 'Off-Road' : 'Mixed'}</type>
     <trkseg>
 `;
-            
+
             routeCoordinates.forEach(coord => {
                 gpx += `      <trkpt lat="${coord[0]}" lon="${coord[1]}"></trkpt>\n`;
             });
-            
+
             gpx += `    </trkseg>
   </trk>
 `;
-            
+
             // Añadir waypoints de inicio y fin
             if (markerA && markerB) {
                 const startCoords = markerA.getLatLng();
                 const endCoords = markerB.getLatLng();
-                
+
                 gpx += `  <wpt lat="${startCoords.lat}" lon="${startCoords.lng}">
     <name>Inicio</name>
     <desc>${searchInputA.value || 'Punto de inicio'}</desc>
@@ -995,9 +1052,9 @@
   </wpt>
 `;
             }
-            
+
             gpx += `</gpx>`;
-            
+
             // Descargar archivo
             const blob = new Blob([gpx], { type: 'application/gpx+xml' });
             const url = URL.createObjectURL(blob);
@@ -1008,14 +1065,14 @@
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
-            
+
             showNotification('📥 Archivo GPX descargado');
         }
-        
+
         document.getElementById('btnExportGPX').addEventListener('click', exportGPX);
 
         // Event Listeners
-        document.getElementById('mapType').addEventListener('change', function(e) {
+        document.getElementById('mapType').addEventListener('change', function (e) {
             // Remover capa actual (puede ser layer o layerGroup)
             if (currentLayer.eachLayer) {
                 currentLayer.eachLayer(layer => map.removeLayer(layer));
@@ -1030,7 +1087,7 @@
         const menuPanel = document.getElementById('menuPanel');
         const toggleMenuBtn = document.getElementById('toggleMenu');
         const menuHandle = document.getElementById('menuHandle');
-        
+
         function toggleMenu() {
             const content = document.getElementById('menuContent');
             const icon = toggleMenuBtn.querySelector('i');
@@ -1039,10 +1096,10 @@
             icon.classList.toggle('fa-chevron-up');
             icon.classList.toggle('fa-chevron-down');
         }
-        
+
         toggleMenuBtn.addEventListener('click', toggleMenu);
         menuHandle.addEventListener('click', toggleMenu);
-        
+
         // Zoom buttons
         document.getElementById('btnZoomIn').addEventListener('click', () => map.zoomIn());
         document.getElementById('btnZoomOut').addEventListener('click', () => map.zoomOut());
@@ -1073,314 +1130,13 @@
         document.getElementById('btnStartNav').addEventListener('click', startNavigation);
         document.getElementById('btnCloseNav').addEventListener('click', stopNavigation);
         document.getElementById('btnCenterMe').addEventListener('click', centerOnUser);
-        document.getElementById('btnDemoMode').addEventListener('click', startDemoMode);
-        
-        // Modo Demo - simular recorrido
-        let demoInterval = null;
-        let demoIndex = 0;
-        
-        function startDemoMode() {
-            if (routeCoordinates.length === 0) {
-                showNotification('⚠️ Primero calcula una ruta');
-                return;
-            }
-            
-            // Debug - ver si hay steps
-            console.log('Demo: routeSteps =', routeSteps.length, 'routeCoordinates =', routeCoordinates.length);
-            if (routeSteps.length > 0) {
-                console.log('Primer step:', routeSteps[0]);
-                console.log('Steps con giros:', routeSteps.filter(s => {
-                    const mod = (s.maneuver.modifier || '').toLowerCase();
-                    return mod.includes('left') || mod.includes('right');
-                }).length);
-            }
-            
-            // Ocultar botón demo
-            document.getElementById('btnDemoMode').classList.add('hidden');
-            showNotification('🎮 Modo Demo iniciado');
-            
-            demoIndex = 0;
-            
-            // Mostrar botón de detener
-            document.getElementById('btnStopDemo').classList.remove('hidden');
-            document.getElementById('btnDemoMode').classList.add('hidden');
-            
-            // Simular movimiento cada 1500ms (velocidad lenta para ver bien)
-            demoInterval = setInterval(() => {
-                if (demoIndex >= routeCoordinates.length) {
-                    clearInterval(demoInterval);
-                    showNotification('🎉 ¡Demo completado!');
-                    speak('Has llegado a tu destino');
-                    return;
-                }
-                
-                const coord = routeCoordinates[demoIndex];
-                const lat = coord[0];
-                const lng = coord[1];
-                
-                // Calcular heading
-                let heading = 0;
-                if (demoIndex < routeCoordinates.length - 1) {
-                    const nextCoord = routeCoordinates[demoIndex + 1];
-                    heading = calculateBearing(
-                        L.latLng(lat, lng),
-                        L.latLng(nextCoord[0], nextCoord[1])
-                    );
-                }
-                
-                // Simular velocidad (30-50 km/h)
-                currentSpeed = Math.floor(Math.random() * 20) + 30;
-                document.getElementById('currentSpeed').textContent = currentSpeed;
-                
-                // Actualizar marcador
-                const userLatLng = L.latLng(lat, lng);
-                currentHeading = heading;
-                
-                if (vehicleMarker) {
-                    vehicleMarker.setLatLng(userLatLng);
-                    vehicleMarker.setIcon(createVehicleIcon(heading));
-                }
-                
-                map.setView(userLatLng, 16);
-                
-                // Buscar si hay un giro cerca y mostrarlo directamente
-                checkForNearbyTurn(userLatLng);
-                
-                // Actualizar navegación
-                updateDemoNavigation(userLatLng);
-                
-                // Avanzar muy despacio para ver bien los giros
-                demoIndex += Math.max(1, Math.floor(routeCoordinates.length / 800));
-                
-            }, 1500);
-        }
-        
-        // Función para detectar giros y rotondas cerca en modo demo
-        function checkForNearbyTurn(userLatLng) {
-            // Buscar cambios de dirección en los próximos puntos
-            const lookAhead = 60; // Mirar los próximos 60 puntos
-            
-            // Detectar si hay una rotonda (muchos giros pequeños seguidos)
-            let isRoundabout = false;
-            let roundaboutStart = -1;
-            let roundaboutEnd = -1;
-            let consecutiveTurns = 0;
-            
-            for (let i = demoIndex; i < Math.min(demoIndex + lookAhead, routeCoordinates.length - 2); i++) {
-                const prev = routeCoordinates[i];
-                const curr = routeCoordinates[i + 1];
-                const next = routeCoordinates[i + 2];
-                
-                if (!prev || !curr || !next) continue;
-                
-                const angle1 = Math.atan2(curr[1] - prev[1], curr[0] - prev[0]);
-                const angle2 = Math.atan2(next[1] - curr[1], next[0] - curr[0]);
-                let turn = (angle2 - angle1) * 180 / Math.PI;
-                
-                while (turn > 180) turn -= 360;
-                while (turn < -180) turn += 360;
-                
-                // Detectar rotonda: muchos giros pequeños consecutivos (curva continua)
-                if (Math.abs(turn) > 5 && Math.abs(turn) < 30) {
-                    if (roundaboutStart === -1) roundaboutStart = i;
-                    consecutiveTurns++;
-                    roundaboutEnd = i;
-                } else if (consecutiveTurns > 0 && Math.abs(turn) < 5) {
-                    // Sigue en la rotonda
-                    consecutiveTurns++;
-                    roundaboutEnd = i;
-                } else {
-                    // Si hay más de 8 giros pequeños seguidos, es una rotonda
-                    if (consecutiveTurns >= 8) {
-                        isRoundabout = true;
-                        break;
-                    }
-                    consecutiveTurns = 0;
-                    roundaboutStart = -1;
-                }
-            }
-            
-            // Si detectamos una rotonda
-            if (isRoundabout && roundaboutStart !== -1 && roundaboutEnd !== -1) {
-                const roundaboutLatLng = L.latLng(routeCoordinates[roundaboutStart][0], routeCoordinates[roundaboutStart][1]);
-                const distance = userLatLng.distanceTo(roundaboutLatLng);
-                
-                if (distance < 500) {
-                    // Calcular la dirección de salida de la rotonda
-                    const entryPoint = routeCoordinates[roundaboutStart];
-                    const exitPoint = routeCoordinates[Math.min(roundaboutEnd + 5, routeCoordinates.length - 1)];
-                    const beforeEntry = routeCoordinates[Math.max(0, roundaboutStart - 3)];
-                    
-                    // Ángulo de entrada
-                    const entryAngle = Math.atan2(entryPoint[1] - beforeEntry[1], entryPoint[0] - beforeEntry[0]);
-                    // Ángulo de salida
-                    const exitAngle = Math.atan2(exitPoint[1] - entryPoint[1], exitPoint[0] - entryPoint[0]);
-                    
-                    let exitDirection = (exitAngle - entryAngle) * 180 / Math.PI;
-                    while (exitDirection > 180) exitDirection -= 360;
-                    while (exitDirection < -180) exitDirection += 360;
-                    
-                    let instruction, icon;
-                    
-                    // Determinar salida de la rotonda
-                    if (exitDirection > -45 && exitDirection < 45) {
-                        // Seguir recto (2ª salida normalmente)
-                        instruction = 'Rotonda: Continúa recto';
-                        icon = '<i class="fas fa-arrow-up"></i>';
-                    } else if (exitDirection >= 45 && exitDirection < 135) {
-                        // Girar a la izquierda (3ª salida)
-                        instruction = 'Rotonda: Izquierda';
-                        icon = '<i class="fas fa-arrow-left"></i>';
-                    } else if (exitDirection <= -45 && exitDirection > -135) {
-                        // Girar a la derecha (1ª salida)
-                        instruction = 'Rotonda: Derecha';
-                        icon = '<i class="fas fa-arrow-right"></i>';
-                    } else {
-                        // Dar la vuelta
-                        instruction = 'Rotonda: Da la vuelta';
-                        icon = '<i class="fas fa-arrow-down"></i>';
-                    }
-                    
-                    // Actualizar panel superior
-                    document.getElementById('turnIcon').innerHTML = '<i class="fas fa-circle-notch"></i>';
-                    document.getElementById('turnDistance').textContent = Math.round(distance) + ' m';
-                    document.getElementById('turnInstruction').textContent = instruction;
-                    
-                    // Mostrar billboard
-                    const billboard = document.getElementById('turnBillboard');
-                    document.getElementById('billboardArrow').innerHTML = icon;
-                    document.getElementById('billboardText').textContent = instruction;
-                    document.getElementById('billboardDistance').textContent = Math.round(distance) + ' m';
-                    billboard.classList.add('show');
-                    
-                    // Alerta si muy cerca
-                    const alertBanner = document.getElementById('alertBanner');
-                    if (distance < 100) {
-                        alertBanner.classList.remove('hidden');
-                        document.getElementById('alertText').textContent = '¡' + instruction + ' en ' + Math.round(distance) + 'm!';
-                    } else {
-                        alertBanner.classList.add('hidden');
-                    }
-                    
-                    return;
-                }
-            }
-            
-            // Buscar giros normales (no rotonda)
-            for (let i = demoIndex; i < Math.min(demoIndex + lookAhead, routeCoordinates.length - 2); i++) {
-                const prev = routeCoordinates[i];
-                const curr = routeCoordinates[i + 1];
-                const next = routeCoordinates[i + 2];
-                
-                if (!prev || !curr || !next) continue;
-                
-                // Calcular ángulo de giro
-                const angle1 = Math.atan2(curr[1] - prev[1], curr[0] - prev[0]);
-                const angle2 = Math.atan2(next[1] - curr[1], next[0] - curr[0]);
-                let turn = (angle2 - angle1) * 180 / Math.PI;
-                
-                while (turn > 180) turn -= 360;
-                while (turn < -180) turn += 360;
-                
-                // Solo giros de ~90 grados (entre 70 y 120 grados)
-                if (Math.abs(turn) >= 70 && Math.abs(turn) <= 120) {
-                    const turnLatLng = L.latLng(curr[0], curr[1]);
-                    const distance = userLatLng.distanceTo(turnLatLng);
-                    
-                    if (distance < 500) {
-                        const isLeft = turn > 0;
-                        const direction = isLeft ? 'Izquierda' : 'Derecha';
-                        const instruction = direction;
-                        const icon = isLeft ? '<i class="fas fa-arrow-left"></i>' : '<i class="fas fa-arrow-right"></i>';
-                        
-                        // Actualizar panel superior
-                        document.getElementById('turnIcon').innerHTML = icon;
-                        
-                        if (distance > 1000) {
-                            document.getElementById('turnDistance').textContent = (distance/1000).toFixed(1) + ' km';
-                        } else {
-                            document.getElementById('turnDistance').textContent = Math.round(distance) + ' m';
-                        }
-                        
-                        document.getElementById('turnInstruction').textContent = instruction;
-                        
-                        // Mostrar billboard
-                        const billboard = document.getElementById('turnBillboard');
-                        document.getElementById('billboardArrow').innerHTML = icon;
-                        document.getElementById('billboardText').textContent = instruction;
-                        document.getElementById('billboardDistance').textContent = Math.round(distance) + ' m';
-                        billboard.classList.add('show');
-                        
-                        // Alerta si muy cerca
-                        const alertBanner = document.getElementById('alertBanner');
-                        if (distance < 100) {
-                            alertBanner.classList.remove('hidden');
-                            document.getElementById('alertText').textContent = '¡' + instruction + ' en ' + Math.round(distance) + 'm!';
-                        } else {
-                            alertBanner.classList.add('hidden');
-                        }
-                        
-                        return; // Solo mostrar el primer giro encontrado
-                    }
-                }
-            }
-            
-            // Si no hay giros cerca, ocultar billboard y mostrar continúa
-            document.getElementById('turnBillboard').classList.remove('show');
-            document.getElementById('alertBanner').classList.add('hidden');
-            document.getElementById('turnInstruction').textContent = 'Continúa recto';
-            document.getElementById('turnIcon').innerHTML = '<i class="fas fa-arrow-up"></i>';
-        }
-        
-        function updateDemoNavigation(userLatLng) {
-            // Distancia al destino
-            const destLatLng = L.latLng(routeCoordinates[routeCoordinates.length - 1]);
-            const remainingDist = userLatLng.distanceTo(destLatLng);
-            
-            if (remainingDist > 1000) {
-                document.getElementById('navRemaining').textContent = (remainingDist/1000).toFixed(1) + ' km';
-            } else {
-                document.getElementById('navRemaining').textContent = Math.round(remainingDist) + ' m';
-            }
-            
-            // Progreso
-            const startLatLng = L.latLng(routeCoordinates[0]);
-            const totalDist = startLatLng.distanceTo(destLatLng);
-            const progress = Math.max(0, Math.min(100, ((totalDist - remainingDist) / totalDist) * 100));
-            document.getElementById('progressFill').style.width = progress + '%';
-            
-            // ETA
-            const etaMinutes = Math.round((remainingDist / 1000) / 40 * 60);
-            const etaTime = new Date(Date.now() + etaMinutes * 60000);
-            document.getElementById('navETA').textContent = etaTime.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
-            
-            // Actualizar paso actual
-            updateCurrentStep(userLatLng);
-        }
-        
-        // Limpiar demo al parar navegación
-        function stopDemo() {
-            if (demoInterval) {
-                clearInterval(demoInterval);
-                demoInterval = null;
-            }
-            demoIndex = 0;
-            // Mostrar botón demo, ocultar stop
-            document.getElementById('btnDemoMode').classList.remove('hidden');
-            document.getElementById('btnStopDemo').classList.add('hidden');
-        }
-        
-        // Botón para detener demo
-        document.getElementById('btnStopDemo').addEventListener('click', () => {
-            stopDemo();
-            showNotification('⏹️ Demo detenido');
-        });
+
 
 
         function updateButtonStyles() {
             const btnA = document.getElementById('btnSetA');
             const btnB = document.getElementById('btnSetB');
-            
+
             if (currentMode === 'A') {
                 btnA.classList.add('ring-2', 'ring-white', 'ring-offset-2', 'ring-offset-gray-900');
                 btnB.classList.remove('ring-2', 'ring-white', 'ring-offset-2', 'ring-offset-gray-900');
@@ -1393,7 +1149,7 @@
         function updateRouteTypeButtons() {
             const btnOffroad = document.getElementById('btnOffroad');
             const btnMixed = document.getElementById('btnMixed');
-            
+
             if (routeType === 'offroad') {
                 btnOffroad.classList.add('bg-orange-600');
                 btnOffroad.classList.remove('hover:bg-gray-700');
@@ -1408,11 +1164,11 @@
         }
 
         // Map click handler
-        map.on('click', function(e) {
+        map.on('click', function (e) {
             if (isNavigating) return;
-            
+
             const latlng = e.latlng;
-            
+
             if (currentMode === 'A') {
                 if (markerA) map.removeLayer(markerA);
                 markerA = L.marker(latlng, {
@@ -1420,10 +1176,10 @@
                     draggable: true
                 }).addTo(map);
                 markerA.bindPopup('<b>Punto de Inicio</b>').openPopup();
-                
+
                 // Update search input and reverse geocode
                 reverseGeocode(latlng, 'A');
-                
+
                 currentMode = 'B';
                 updateButtonStyles();
             } else {
@@ -1433,38 +1189,38 @@
                     draggable: true
                 }).addTo(map);
                 markerB.bindPopup('<b>Punto de Destino</b>').openPopup();
-                
+
                 // Update search input and reverse geocode
                 reverseGeocode(latlng, 'B');
-                
+
                 currentMode = 'A';
                 updateButtonStyles();
             }
         });
-        
+
         // Reverse geocode to get address from coordinates
         async function reverseGeocode(latlng, point) {
             const input = point === 'A' ? searchInputA : searchInputB;
             const clearBtn = point === 'A' ? clearSearchA : clearSearchB;
-            
+
             input.value = '📍 Cargando dirección...';
             clearBtn.style.display = 'block';
-            
+
             try {
                 const response = await fetch(
                     `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latlng.lat}&lon=${latlng.lng}&addressdetails=1`,
                     { headers: { 'Accept-Language': 'es' } }
                 );
-                
+
                 const data = await response.json();
-                
+
                 if (data && data.display_name) {
-                    const shortName = data.address?.road || 
-                                     data.address?.hamlet || 
-                                     data.address?.village || 
-                                     data.address?.town || 
-                                     data.address?.city ||
-                                     data.display_name.split(',')[0];
+                    const shortName = data.address?.road ||
+                        data.address?.hamlet ||
+                        data.address?.village ||
+                        data.address?.town ||
+                        data.address?.city ||
+                        data.display_name.split(',')[0];
                     input.value = shortName;
                 } else {
                     input.value = `📍 ${latlng.lat.toFixed(4)}, ${latlng.lng.toFixed(4)}`;
@@ -1487,7 +1243,7 @@
             }
 
             document.getElementById('loading').classList.remove('hidden');
-            
+
             // Actualizar texto de carga según modo
             if (routeType === 'offroad') {
                 document.getElementById('loadingText').textContent = 'Buscando caminos de tierra...';
@@ -1500,7 +1256,7 @@
             const startCoords = markerA.getLatLng();
             const endCoords = markerB.getLatLng();
             const requestKey = `${startCoords.lat},${startCoords.lng}-${endCoords.lat},${endCoords.lng}-${routeType}`;
-            
+
             // Si es la misma ruta, mostrar la siguiente alternativa
             if (lastRouteRequest === requestKey && allRoutes.length > 1) {
                 currentRouteIndex = (currentRouteIndex + 1) % allRoutes.length;
@@ -1508,12 +1264,12 @@
                 document.getElementById('loading').classList.add('hidden');
                 return;
             }
-            
+
             // Nueva búsqueda de rutas
             lastRouteRequest = requestKey;
             allRoutes = [];
             currentRouteIndex = 0;
-            
+
             try {
                 if (routeType === 'offroad') {
                     // Usar BRouter con perfil MTB para evitar asfalto
@@ -1529,27 +1285,27 @@
 
             document.getElementById('loading').classList.add('hidden');
         }
-        
+
         // Calcular ruta OFF-ROAD usando BRouter (evita asfalto)
         async function calculateOffroadRoute(startCoords, endCoords) {
             // BRouter profiles para off-road: mtb, trekking, hiking
             const profiles = ['mtb', 'trekking', 'hiking'];
-            
+
             for (const profile of profiles) {
                 try {
                     // BRouter API
                     const brouterUrl = `https://brouter.de/brouter?lonlats=${startCoords.lng},${startCoords.lat}|${endCoords.lng},${endCoords.lat}&profile=${profile}&alternativeidx=0&format=geojson`;
-                    
+
                     const response = await fetch(brouterUrl);
-                    
+
                     if (response.ok) {
                         const data = await response.json();
-                        
+
                         if (data.features && data.features.length > 0) {
                             const feature = data.features[0];
                             const coords = feature.geometry.coordinates;
                             const properties = feature.properties;
-                            
+
                             // Convertir a formato compatible
                             const route = {
                                 geometry: feature.geometry,
@@ -1562,7 +1318,7 @@
                                     steps: generateStepsFromCoords(coords, properties.messages || [])
                                 }]
                             };
-                            
+
                             allRoutes.push(route);
                         }
                     }
@@ -1570,7 +1326,7 @@
                     console.log(`Error con perfil ${profile}:`, e);
                 }
             }
-            
+
             // También intentar rutas alternativas con waypoints
             if (allRoutes.length < 3) {
                 try {
@@ -1580,7 +1336,7 @@
                     console.log('Error generando alternativas:', e);
                 }
             }
-            
+
             if (allRoutes.length > 0) {
                 displayRoute(allRoutes[0], 1, allRoutes.length);
                 showNotification(`🏔️ Ruta OFF-ROAD encontrada (${allRoutes[0].profile || 'mtb'})`);
@@ -1590,19 +1346,19 @@
                 await calculateMixedRoute(startCoords, endCoords);
             }
         }
-        
+
         // Generar steps de navegación desde coordenadas
         function generateStepsFromCoords(coords, messages) {
             const steps = [];
-            
+
             // Calcular giros basados en cambios de dirección en las coordenadas
             for (let i = 0; i < coords.length; i++) {
                 const coord = coords[i];
-                
+
                 // Calcular dirección si hay punto anterior y siguiente
                 let modifier = 'straight';
                 let type = 'continue';
-                
+
                 if (i === 0) {
                     type = 'depart';
                 } else if (i === coords.length - 1) {
@@ -1612,15 +1368,15 @@
                     const prev = coords[i - 1];
                     const curr = coords[i];
                     const next = coords[i + 1];
-                    
+
                     const angle1 = Math.atan2(curr[1] - prev[1], curr[0] - prev[0]);
                     const angle2 = Math.atan2(next[1] - curr[1], next[0] - curr[0]);
                     let turn = (angle2 - angle1) * 180 / Math.PI;
-                    
+
                     // Normalizar a -180 a 180
                     while (turn > 180) turn -= 360;
                     while (turn < -180) turn += 360;
-                    
+
                     // Detectar giros significativos (> 30 grados)
                     if (turn > 30 && turn < 150) {
                         type = 'turn';
@@ -1633,11 +1389,11 @@
                         modifier = turn > 0 ? 'sharp right' : 'sharp left';
                     }
                 }
-                
+
                 // Solo añadir steps cada ciertos puntos o si hay giro
                 const isImportant = type === 'depart' || type === 'arrive' || type === 'turn';
                 const isInterval = i % Math.max(1, Math.floor(coords.length / 20)) === 0;
-                
+
                 if (isImportant || isInterval) {
                     steps.push({
                         maneuver: {
@@ -1650,12 +1406,12 @@
                     });
                 }
             }
-            
+
             console.log('Steps generados:', steps.length, steps.filter(s => s.maneuver.modifier.includes('left') || s.maneuver.modifier.includes('right')).length, 'giros');
-            
+
             return steps;
         }
-        
+
         // Generar alternativas off-road con waypoints
         async function generateOffroadAlternatives(start, end) {
             const alternatives = [];
@@ -1663,31 +1419,31 @@
             const midLng = (start.lng + end.lng) / 2;
             const distance = start.distanceTo(end);
             const offset = distance / 111000 * 0.1; // 10% de la distancia
-            
+
             const offsets = [
                 { lat: offset, lng: 0 },
                 { lat: -offset, lng: 0 },
                 { lat: 0, lng: offset },
                 { lat: 0, lng: -offset }
             ];
-            
+
             for (const off of offsets) {
                 try {
                     const waypoint = {
                         lat: midLat + off.lat,
                         lng: midLng + off.lng
                     };
-                    
+
                     const brouterUrl = `https://brouter.de/brouter?lonlats=${start.lng},${start.lat}|${waypoint.lng},${waypoint.lat}|${end.lng},${end.lat}&profile=mtb&alternativeidx=0&format=geojson`;
-                    
+
                     const response = await fetch(brouterUrl);
-                    
+
                     if (response.ok) {
                         const data = await response.json();
                         if (data.features && data.features.length > 0) {
                             const feature = data.features[0];
                             const properties = feature.properties;
-                            
+
                             const route = {
                                 geometry: feature.geometry,
                                 distance: properties['track-length'] || 0,
@@ -1698,12 +1454,12 @@
                                     steps: generateStepsFromCoords(feature.geometry.coordinates, properties.messages || [])
                                 }]
                             };
-                            
+
                             // Solo añadir si es diferente
-                            const isDifferent = !alternatives.some(r => 
+                            const isDifferent = !alternatives.some(r =>
                                 Math.abs(r.distance - route.distance) < route.distance * 0.05
                             );
-                            
+
                             if (isDifferent) {
                                 alternatives.push(route);
                             }
@@ -1713,10 +1469,10 @@
                     console.log('Error alternativa off-road:', e);
                 }
             }
-            
+
             return alternatives;
         }
-        
+
         // Calcular ruta MIXTA usando OSRM
         async function calculateMixedRoute(startCoords, endCoords) {
             const response = await fetch(
@@ -1726,20 +1482,20 @@
             if (!response.ok) throw new Error('Error en la API');
 
             const data = await response.json();
-            
+
             if (data.routes && data.routes.length > 0) {
                 allRoutes = data.routes;
-                
+
                 // Si solo hay una ruta, intentar generar alternativas con waypoints
                 if (allRoutes.length === 1) {
                     const extraRoutes = await generateAlternativeRoutes(startCoords, endCoords);
                     allRoutes = [...allRoutes, ...extraRoutes];
                 }
-                
+
                 displayRoute(allRoutes[0], 1, allRoutes.length);
             }
         }
-        
+
         // Generar rutas alternativas con waypoints aleatorios
         async function generateAlternativeRoutes(start, end) {
             const alternatives = [];
@@ -1747,7 +1503,7 @@
             const midLng = (start.lng + end.lng) / 2;
             const distance = start.distanceTo(end);
             const offset = distance / 111000 * 0.15; // 15% de la distancia en grados
-            
+
             // Generar 3 waypoints diferentes (izquierda, derecha, arriba)
             const offsets = [
                 { lat: offset, lng: offset },      // Noreste
@@ -1757,24 +1513,24 @@
                 { lat: offset * 1.5, lng: 0 },     // Norte
                 { lat: -offset * 1.5, lng: 0 },    // Sur
             ];
-            
+
             for (const off of offsets) {
                 try {
                     const waypoint = {
                         lat: midLat + off.lat + (Math.random() - 0.5) * offset * 0.5,
                         lng: midLng + off.lng + (Math.random() - 0.5) * offset * 0.5
                     };
-                    
+
                     const response = await fetch(
                         `https://router.project-osrm.org/route/v1/driving/${start.lng},${start.lat};${waypoint.lng},${waypoint.lat};${end.lng},${end.lat}?overview=full&geometries=geojson&steps=true`
                     );
-                    
+
                     if (response.ok) {
                         const data = await response.json();
                         if (data.routes && data.routes.length > 0) {
                             // Solo añadir si es significativamente diferente
                             const newDist = data.routes[0].distance;
-                            const isDifferent = !alternatives.some(r => 
+                            const isDifferent = !alternatives.some(r =>
                                 Math.abs(r.distance - newDist) < newDist * 0.05
                             );
                             if (isDifferent && alternatives.length < 5) {
@@ -1786,45 +1542,45 @@
                     console.log('Error generando alternativa:', e);
                 }
             }
-            
+
             return alternatives;
         }
-        
+
         // Mostrar una ruta específica
         function displayRoute(route, index, total) {
             if (routeLayer) map.removeLayer(routeLayer);
-            
+
             // Store route data for navigation
             routeCoordinates = route.geometry.coordinates.map(c => [c[1], c[0]]);
             routeSteps = route.legs ? route.legs[0].steps : [];
             totalDistance = route.distance;
-            
+
             // Colores diferentes para cada ruta alternativa
             const colors = ['#f97316', '#10b981', '#8b5cf6', '#ec4899', '#06b6d4', '#eab308'];
             const routeColor = colors[(index - 1) % colors.length];
-            
+
             const routeStyle = {
                 color: routeColor,
                 weight: 6,
                 opacity: 0.85,
                 dashArray: routeType === 'offroad' ? '12, 8' : null
             };
-            
+
             routeLayer = L.geoJSON(route.geometry, { style: routeStyle }).addTo(map);
             map.fitBounds(routeLayer.getBounds(), { padding: [50, 50] });
-            
+
             const distance = (route.distance / 1000).toFixed(1);
-            
+
             // Calcular duración - siempre estimar basado en distancia y velocidad
             // BRouter a veces da valores incorrectos, mejor calcular nosotros
             const avgSpeed = routeType === 'offroad' ? 25 : 50; // km/h
             let duration = Math.round((route.distance / 1000) / avgSpeed * 60); // minutos
-            
+
             // Ajustar para off-road (terreno más difícil)
             if (routeType === 'offroad') {
                 duration = Math.round(duration * 1.2);
             }
-            
+
             // Mostrar desnivel real si está disponible (BRouter)
             let elevation;
             if (route.ascend) {
@@ -1832,9 +1588,9 @@
             } else {
                 elevation = Math.round(parseFloat(distance) * 15); // Estimación
             }
-            
+
             document.getElementById('distance').textContent = `${distance} km`;
-            
+
             // Formatear duración: si es >= 60 min, mostrar en horas
             if (duration >= 60) {
                 const hours = Math.floor(duration / 60);
@@ -1849,10 +1605,10 @@
             }
             document.getElementById('elevation').textContent = `↑${elevation} m`;
             document.getElementById('routeInfo').classList.remove('hidden');
-            
+
             // Mostrar el tipo de ruta
             const profileText = route.profile ? ` (${route.profile})` : '';
-            
+
             if (total > 1) {
                 showNotification(`🛤️ Ruta ${index}/${total}${profileText} - ¡Pulsa para ver otra!`);
             } else {
@@ -1869,36 +1625,36 @@
 
             isNavigating = true;
             currentStepIndex = 0;
-            
+
             // Hide planning UI, show navigation UI
             document.getElementById('menuPanel').classList.add('hidden');
             document.getElementById('fabContainer').classList.add('hidden');
             document.getElementById('navMode').classList.remove('hidden');
-            
+
             // Crear marcador de vehículo
             if (vehicleMarker) map.removeLayer(vehicleMarker);
             if (userMarker) map.removeLayer(userMarker);
-            
+
             // Centrar en el inicio de la ruta primero
             const startPoint = L.latLng(routeCoordinates[0][0], routeCoordinates[0][1]);
-            
+
             // Forzar actualización del mapa después de un pequeño delay
             setTimeout(() => {
                 map.invalidateSize();
                 map.setView(startPoint, 15);
-                
+
                 // Crear marcador de vehículo en el punto inicial
                 vehicleMarker = L.marker(startPoint, {
                     icon: createVehicleIcon(0),
                     zIndexOffset: 1000
                 }).addTo(map);
-                
+
                 // Forzar recarga de tiles
                 setTimeout(() => {
                     map.invalidateSize();
                 }, 100);
             }, 50);
-            
+
             // Start watching position
             if ('geolocation' in navigator) {
                 watchId = navigator.geolocation.watchPosition(
@@ -1910,7 +1666,7 @@
                         timeout: 10000
                     }
                 );
-                
+
                 showNotification('🧭 Navegación iniciada - Esperando GPS...');
                 document.getElementById('turnInstruction').textContent = 'Esperando señal GPS...';
                 document.getElementById('turnDistance').textContent = 'Activa tu GPS';
@@ -1918,13 +1674,13 @@
                 showNotification('⚠️ Geolocalización no disponible en este dispositivo');
                 document.getElementById('turnInstruction').textContent = 'GPS no disponible';
             }
-            
+
             // Activar wake lock para mantener pantalla encendida
             requestWakeLock();
-            
+
             // Initial UI update
             updateNavigationUI();
-            
+
 
         }
 
@@ -1935,21 +1691,21 @@
             const accuracy = position.coords.accuracy;
             const speed = position.coords.speed;
             const heading = position.coords.heading;
-            
+
             // Update speed
             currentSpeed = speed ? Math.round(speed * 3.6) : 0;
             document.getElementById('currentSpeed').textContent = currentSpeed;
-            
+
             // Calcular heading si no está disponible
             const userLatLng = L.latLng(lat, lng);
-            
+
             if (lastPosition) {
                 const calculatedHeading = calculateBearing(lastPosition, userLatLng);
                 if (calculatedHeading !== null && currentSpeed > 2) {
                     currentHeading = heading || calculatedHeading;
                 }
             }
-            
+
             // Update or create vehicle marker (flecha direccional)
             if (vehicleMarker) {
                 vehicleMarker.setLatLng(userLatLng);
@@ -1960,120 +1716,120 @@
                     zIndexOffset: 1000
                 }).addTo(map);
             }
-            
+
             // El icono del vehículo rota según heading
             rotateMap(currentHeading);
-            
+
             // Center map on user - zoom moderado para ver bien el mapa
             map.setView(userLatLng, 15);
-            
+
             // Asegurar que el mapa se renderiza correctamente
             if (!map._loaded) {
                 map.invalidateSize();
             }
-            
+
             // Calculate distance to destination
             const destLatLng = L.latLng(routeCoordinates[routeCoordinates.length - 1]);
             const remainingDist = userLatLng.distanceTo(destLatLng);
-            
+
             // Update remaining distance
             if (remainingDist > 1000) {
-                document.getElementById('navRemaining').textContent = `${(remainingDist/1000).toFixed(1)} km`;
+                document.getElementById('navRemaining').textContent = `${(remainingDist / 1000).toFixed(1)} km`;
             } else {
                 document.getElementById('navRemaining').textContent = `${Math.round(remainingDist)} m`;
             }
-            
+
             // Calculate progress
             const startLatLng = L.latLng(routeCoordinates[0]);
             const totalDist = startLatLng.distanceTo(destLatLng);
             const progress = Math.max(0, Math.min(100, ((totalDist - remainingDist) / totalDist) * 100));
             document.getElementById('progressFill').style.width = `${progress}%`;
-            
+
             // Calculate ETA
             const avgSpeed = currentSpeed > 5 ? currentSpeed : 30; // Default 30 km/h
             const etaMinutes = Math.round((remainingDist / 1000) / avgSpeed * 60);
             const etaTime = new Date(Date.now() + etaMinutes * 60000);
             document.getElementById('navETA').textContent = etaTime.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
-            
+
             // Find current step
             updateCurrentStep(userLatLng);
-            
+
             // Check if arrived
             if (remainingDist < 50) {
                 showNotification('🎉 ¡Has llegado a tu destino!');
                 stopNavigation();
             }
-            
+
             lastPosition = userLatLng;
         }
 
         // Update current navigation step
         function updateCurrentStep(userLatLng) {
             if (!routeSteps || routeSteps.length === 0) return;
-            
+
             // Find the closest step
             let minDist = Infinity;
             let closestStepIdx = currentStepIndex;
-            
+
             for (let i = currentStepIndex; i < routeSteps.length; i++) {
                 const step = routeSteps[i];
                 const stepCoord = step.maneuver.location;
                 const stepLatLng = L.latLng(stepCoord[1], stepCoord[0]);
                 const dist = userLatLng.distanceTo(stepLatLng);
-                
+
                 if (dist < minDist) {
                     minDist = dist;
                     closestStepIdx = i;
                 }
             }
-            
+
 
             currentStepIndex = closestStepIdx;
             const currentStep = routeSteps[currentStepIndex];
-            
+
             // Update turn instruction
             const maneuver = currentStep.maneuver;
             const turnType = maneuver.type || '';
             const modifier = maneuver.modifier || '';
-            
+
             // Debug - ver qué valores llegan
             console.log('Turn:', turnType, 'Modifier:', modifier, 'Dist:', Math.round(minDist));
-            
+
             // Detectar si es giro izquierda o derecha (varias formas posibles)
             const modLower = modifier.toLowerCase();
             const typeLower = turnType.toLowerCase();
             const isLeft = modLower.includes('left') || typeLower.includes('left');
             const isRight = modLower.includes('right') || typeLower.includes('right');
             const isRealTurn = isLeft || isRight;
-            
+
             // Get turn icon
             const turnIcon = getTurnIcon(turnType, modifier);
             document.getElementById('turnIcon').innerHTML = '<i class="fas ' + turnIcon + '"></i>';
-            
+
             // Distance to next maneuver
             if (minDist > 1000) {
-                document.getElementById('turnDistance').textContent = (minDist/1000).toFixed(1) + ' km';
+                document.getElementById('turnDistance').textContent = (minDist / 1000).toFixed(1) + ' km';
             } else {
                 document.getElementById('turnDistance').textContent = Math.round(minDist) + ' m';
             }
-            
+
             // Instruction text
             const instruction = getInstructionText(turnType, modifier);
             document.getElementById('turnInstruction').textContent = instruction;
             document.getElementById('streetName').textContent = currentStep.name || 'Camino sin nombre';
-            
+
             // Referencias a elementos
             const alertBanner = document.getElementById('alertBanner');
             const billboard = document.getElementById('turnBillboard');
-            
+
             // Si es un giro real
             if (isRealTurn) {
 
-                
+
                 // Mostrar cartel si estamos cerca
                 if (minDist < 500) {
                     showTurnBillboard(turnType, modifier, minDist, currentStep.name);
-                    
+
                     // Banner de alerta muy cerca
                     if (minDist < 100) {
                         alertBanner.classList.remove('hidden');
@@ -2091,25 +1847,25 @@
                 alertBanner.classList.add('hidden');
             }
         }
-        
+
         // Mostrar indicador de giro compacto - SOLO para giros izquierda/derecha
         function showTurnBillboard(turnType, modifier, distance, streetName) {
             const billboard = document.getElementById('turnBillboard');
             const arrow = document.getElementById('billboardArrow');
             const text = document.getElementById('billboardText');
             const distEl = document.getElementById('billboardDistance');
-            
+
             // Detectar giro (múltiples formatos posibles)
             const modLower = (modifier || '').toLowerCase();
             const typeLower = (turnType || '').toLowerCase();
             const isLeft = modLower.includes('left') || typeLower.includes('left');
             const isRight = modLower.includes('right') || typeLower.includes('right');
-            
+
             if (!isLeft && !isRight) {
                 billboard.classList.remove('show');
                 return;
             }
-            
+
             // Determinar icono y texto
             if (isLeft) {
                 arrow.innerHTML = '<i class="fas fa-arrow-left"></i>';
@@ -2118,40 +1874,40 @@
                 arrow.innerHTML = '<i class="fas fa-arrow-right"></i>';
                 text.textContent = 'Gira a la derecha';
             }
-            
+
             if (distance > 1000) {
-                distEl.textContent = (distance/1000).toFixed(1) + ' km';
+                distEl.textContent = (distance / 1000).toFixed(1) + ' km';
             } else {
                 distEl.textContent = Math.round(distance) + ' m';
             }
-            
+
             billboard.classList.add('show');
-            
+
             // Ocultar después de 4 segundos
             clearTimeout(billboardTimeout);
-            billboardTimeout = setTimeout(function() {
+            billboardTimeout = setTimeout(function () {
                 billboard.classList.remove('show');
             }, 4000);
         }
-        
+
         // Calcular bearing entre dos puntos
         function calculateBearing(start, end) {
             if (!start || !end) return 0;
-            
+
             const startLat = start.lat * Math.PI / 180;
             const startLng = start.lng * Math.PI / 180;
             const endLat = end.lat * Math.PI / 180;
             const endLng = end.lng * Math.PI / 180;
-            
+
             const dLng = endLng - startLng;
-            
+
             const x = Math.sin(dLng) * Math.cos(endLat);
             const y = Math.cos(startLat) * Math.sin(endLat) - Math.sin(startLat) * Math.cos(endLat) * Math.cos(dLng);
-            
+
             let bearing = Math.atan2(x, y) * 180 / Math.PI;
             return (bearing + 360) % 360;
         }
-        
+
         // Rotar el mapa según heading (desactivado - causa problemas de renderizado)
         function rotateMap(heading) {
             // El icono del vehículo ya rota, no necesitamos rotar el mapa
@@ -2172,7 +1928,7 @@
                 'arrive': 'fa-flag-checkered',
                 'depart': 'fa-play'
             };
-            
+
             if (modifier && icons[modifier]) return icons[modifier];
             if (icons[type]) return icons[type];
             return 'fa-arrow-up';
@@ -2197,7 +1953,7 @@
                 'new name': 'Continúa por',
                 'continue': 'Continúa recto'
             };
-            
+
             if (type === 'turn' && modifier) {
                 return instructions.turn[modifier] || 'Continúa';
             }
@@ -2209,7 +1965,7 @@
             showNotification('⚠️ Error de GPS. Verifica los permisos de ubicación.');
             document.getElementById('turnInstruction').textContent = 'Esperando señal GPS...';
             document.getElementById('turnDistance').textContent = '--';
-            
+
             // Reintentar obtener ubicación cada 5 segundos
             setTimeout(() => {
                 if (isNavigating) {
@@ -2227,36 +1983,34 @@
         // Stop navigation
         function stopNavigation() {
             isNavigating = false;
-            
-            // Parar demo si está activo
-            stopDemo();
-            
+
+
             if (watchId) {
                 navigator.geolocation.clearWatch(watchId);
                 watchId = null;
             }
-            
+
             // Desactivar modo navegación
             const mapContainer = document.getElementById('map');
             mapContainer.classList.remove('navigation-mode');
-            
+
             // Ocultar cartel de giro
             document.getElementById('turnBillboard').classList.remove('show');
-            
+
             // Limpiar marcador de vehículo
             if (vehicleMarker) {
                 map.removeLayer(vehicleMarker);
                 vehicleMarker = null;
             }
-            
+
             // Restaurar zoom
             map.setZoom(14);
-            
+
             // Show planning UI, hide navigation UI
             document.getElementById('menuPanel').classList.remove('hidden');
             document.getElementById('fabContainer').classList.remove('hidden');
             document.getElementById('navMode').classList.add('hidden');
-            
+
             showNotification('🛑 Navegación finalizada');
         }
 
@@ -2275,19 +2029,19 @@
                 const firstStep = routeSteps[0];
                 document.getElementById('turnInstruction').textContent = 'Inicia el recorrido';
                 document.getElementById('streetName').textContent = firstStep.name || 'Ruta off-road';
-                document.getElementById('navRemaining').textContent = `${(totalDistance/1000).toFixed(1)} km`;
+                document.getElementById('navRemaining').textContent = `${(totalDistance / 1000).toFixed(1)} km`;
             }
         }
 
         function showNotification(message) {
             const existing = document.querySelector('.notification-toast');
             if (existing) existing.remove();
-            
+
             const notification = document.createElement('div');
             notification.className = 'notification-toast';
             notification.innerHTML = message;
             document.body.appendChild(notification);
-            
+
             // Animación de entrada
             notification.style.opacity = '0';
             notification.style.transform = 'translateY(20px)';
@@ -2296,7 +2050,7 @@
                 notification.style.opacity = '1';
                 notification.style.transform = 'translateY(0)';
             });
-            
+
             setTimeout(() => {
                 notification.style.opacity = '0';
                 notification.style.transform = 'translateY(20px)';
@@ -2309,7 +2063,7 @@
             if (markerB) map.removeLayer(markerB);
             if (routeLayer) map.removeLayer(routeLayer);
             if (userMarker) map.removeLayer(userMarker);
-            
+
             markerA = null;
             markerB = null;
             routeLayer = null;
@@ -2317,12 +2071,12 @@
             routeCoordinates = [];
             routeSteps = [];
             currentMode = 'A';
-            
+
             // Limpiar rutas alternativas
             allRoutes = [];
             currentRouteIndex = 0;
             lastRouteRequest = null;
-            
+
             // Clear search inputs
             searchInputA.value = '';
             searchInputB.value = '';
@@ -2332,7 +2086,7 @@
             loadingB.style.display = 'none';
             resultsA.classList.remove('show');
             resultsB.classList.remove('show');
-            
+
             document.getElementById('routeInfo').classList.add('hidden');
             updateButtonStyles();
             showNotification('🗑️ Mapa limpiado');
@@ -2341,10 +2095,10 @@
         // ==========================================
         // SEARCH FUNCTIONALITY WITH AUTOCOMPLETE
         // ==========================================
-        
+
         let searchTimeoutA = null;
         let searchTimeoutB = null;
-        
+
         const searchInputA = document.getElementById('searchInputA');
         const searchInputB = document.getElementById('searchInputB');
         const resultsA = document.getElementById('resultsA');
@@ -2353,43 +2107,43 @@
         const clearSearchB = document.getElementById('clearSearchB');
         const loadingA = document.getElementById('loadingA');
         const loadingB = document.getElementById('loadingB');
-        
+
         // Search input A
         searchInputA.addEventListener('input', (e) => {
             const query = e.target.value.trim();
             clearTimeout(searchTimeoutA);
-            
+
             if (query.length < 3) {
                 resultsA.classList.remove('show');
                 clearSearchA.style.display = 'none';
                 loadingA.style.display = 'none';
                 return;
             }
-            
+
             loadingA.style.display = 'block';
             clearSearchA.style.display = 'none';
-            
+
             searchTimeoutA = setTimeout(() => searchAddress(query, 'A'), 500);
         });
-        
+
         // Search input B
         searchInputB.addEventListener('input', (e) => {
             const query = e.target.value.trim();
             clearTimeout(searchTimeoutB);
-            
+
             if (query.length < 3) {
                 resultsB.classList.remove('show');
                 clearSearchB.style.display = 'none';
                 loadingB.style.display = 'none';
                 return;
             }
-            
+
             loadingB.style.display = 'block';
             clearSearchB.style.display = 'none';
-            
+
             searchTimeoutB = setTimeout(() => searchAddress(query, 'B'), 500);
         });
-        
+
         // Clear buttons
         clearSearchA.addEventListener('click', () => {
             searchInputA.value = '';
@@ -2400,7 +2154,7 @@
                 markerA = null;
             }
         });
-        
+
         clearSearchB.addEventListener('click', () => {
             searchInputB.value = '';
             resultsB.classList.remove('show');
@@ -2410,13 +2164,13 @@
                 markerB = null;
             }
         });
-        
+
         // Search address using Nominatim
         async function searchAddress(query, point) {
             const resultsDiv = point === 'A' ? resultsA : resultsB;
             const loadingEl = point === 'A' ? loadingA : loadingB;
             const clearEl = point === 'A' ? clearSearchA : clearSearchB;
-            
+
             try {
                 const response = await fetch(
                     `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=5&addressdetails=1`,
@@ -2426,12 +2180,12 @@
                         }
                     }
                 );
-                
+
                 const data = await response.json();
-                
+
                 loadingEl.style.display = 'none';
                 clearEl.style.display = 'block';
-                
+
                 if (data.length === 0) {
                     resultsDiv.innerHTML = `
                         <div class="search-result-item text-gray-400">
@@ -2442,7 +2196,7 @@
                     resultsDiv.classList.add('show');
                     return;
                 }
-                
+
                 resultsDiv.innerHTML = data.map((item, index) => `
                     <div class="search-result-item" data-lat="${item.lat}" data-lon="${item.lon}" data-name="${item.display_name}" data-point="${point}">
                         <i class="fas ${getPlaceIcon(item.type)}"></i>
@@ -2452,14 +2206,14 @@
                         </div>
                     </div>
                 `).join('');
-                
+
                 resultsDiv.classList.add('show');
-                
+
                 // Add click handlers to results
                 resultsDiv.querySelectorAll('.search-result-item[data-lat]').forEach(item => {
                     item.addEventListener('click', () => selectSearchResult(item));
                 });
-                
+
             } catch (error) {
                 console.error('Search error:', error);
                 loadingEl.style.display = 'none';
@@ -2473,7 +2227,7 @@
                 resultsDiv.classList.add('show');
             }
         }
-        
+
         function getPlaceIcon(type) {
             const icons = {
                 'city': 'fa-city',
@@ -2498,7 +2252,7 @@
             };
             return icons[type] || 'fa-map-marker-alt';
         }
-        
+
         function getShortName(item) {
             if (item.address) {
                 if (item.address.road) return item.address.road;
@@ -2509,27 +2263,27 @@
             }
             return item.display_name.split(',')[0];
         }
-        
+
         function selectSearchResult(item) {
             const lat = parseFloat(item.dataset.lat);
             const lon = parseFloat(item.dataset.lon);
             const name = item.dataset.name;
             const point = item.dataset.point;
-            
+
             const latlng = L.latLng(lat, lon);
-            
+
             if (point === 'A') {
                 if (markerA) map.removeLayer(markerA);
                 markerA = L.marker(latlng, {
                     icon: createMarkerIcon('A', '#22c55e'),
                     draggable: true
                 }).addTo(map);
-                markerA.bindPopup(`<b>Inicio:</b><br>${name.split(',').slice(0,2).join(',')}`);
-                
-                searchInputA.value = getShortName({display_name: name, address: null});
+                markerA.bindPopup(`<b>Inicio:</b><br>${name.split(',').slice(0, 2).join(',')}`);
+
+                searchInputA.value = getShortName({ display_name: name, address: null });
                 resultsA.classList.remove('show');
                 clearSearchA.style.display = 'block';
-                
+
                 // Auto-focus to point B
                 searchInputB.focus();
             } else {
@@ -2538,23 +2292,23 @@
                     icon: createMarkerIcon('B', '#ef4444'),
                     draggable: true
                 }).addTo(map);
-                markerB.bindPopup(`<b>Destino:</b><br>${name.split(',').slice(0,2).join(',')}`);
-                
-                searchInputB.value = getShortName({display_name: name, address: null});
+                markerB.bindPopup(`<b>Destino:</b><br>${name.split(',').slice(0, 2).join(',')}`);
+
+                searchInputB.value = getShortName({ display_name: name, address: null });
                 resultsB.classList.remove('show');
                 clearSearchB.style.display = 'block';
             }
-            
+
             // Zoom to marker
             map.setView(latlng, 14);
-            
+
             // If both markers exist, fit bounds
             if (markerA && markerB) {
                 const group = L.featureGroup([markerA, markerB]);
                 map.fitBounds(group.getBounds(), { padding: [50, 50] });
             }
         }
-        
+
         // Close search results when clicking outside
         document.addEventListener('click', (e) => {
             if (!e.target.closest('.search-container')) {
@@ -2562,24 +2316,24 @@
                 resultsB.classList.remove('show');
             }
         });
-        
+
         // Use current location as start point
         document.getElementById('btnLocate').addEventListener('click', () => {
             if ('geolocation' in navigator) {
                 navigator.geolocation.getCurrentPosition(
                     (position) => {
                         const latlng = L.latLng(position.coords.latitude, position.coords.longitude);
-                        
+
                         if (markerA) map.removeLayer(markerA);
                         markerA = L.marker(latlng, {
                             icon: createMarkerIcon('A', '#22c55e'),
                             draggable: true
                         }).addTo(map);
                         markerA.bindPopup('<b>Tu ubicación actual</b>');
-                        
+
                         searchInputA.value = '📍 Mi ubicación actual';
                         clearSearchA.style.display = 'block';
-                        
+
                         map.setView(latlng, 15);
                         showNotification('📍 Ubicación establecida como punto de inicio');
                     },
@@ -2596,7 +2350,7 @@
         updateRouteTypeButtons();
 
         // Geolocation events
-        map.on('locationfound', function(e) {
+        map.on('locationfound', function (e) {
             if (!isNavigating && !userMarker) {
                 userMarker = L.marker(e.latlng, {
                     icon: createUserIcon()
@@ -2604,7 +2358,7 @@
             }
         });
 
-        map.on('locationerror', function(e) {
+        map.on('locationerror', function (e) {
             showNotification('📍 No se pudo obtener tu ubicación');
         });
 
@@ -2622,7 +2376,7 @@
         }
 
         // Prevent pull-to-refresh on mobile
-        document.body.addEventListener('touchmove', function(e) {
+        document.body.addEventListener('touchmove', function (e) {
             if (e.target.closest('#map')) return;
             e.preventDefault();
         }, { passive: false });
@@ -2648,4 +2402,5 @@
         }
     </script>
 </body>
+
 </html>
