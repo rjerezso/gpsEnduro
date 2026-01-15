@@ -52,9 +52,15 @@
         }
 
         /* Enable smooth map rotation */
-        #map.navigating .leaflet-map-pane {
+        .leaflet-map-pane {
             transition: transform 0.5s ease-out;
+            transform-origin: center center;
         }
+
+        #map.navigating .leaflet-map-pane {
+            will-change: transform;
+        }
+
 
         .leaflet-container {
             font-family: inherit;
@@ -756,10 +762,14 @@
         // Funciones para rotación del mapa tipo GPS
         function setMapRotation(degrees) {
             mapRotation = degrees;
-            const mapPane = map.getPane('mapPane');
+            // Obtener el contenedor interno de Leaflet que contiene todos los tiles y overlays
+            const mapContainer = map.getContainer();
+            const mapPane = mapContainer.querySelector('.leaflet-map-pane');
             if (mapPane) {
                 // Rotar el mapa para que el vehículo siempre apunte hacia arriba
                 mapPane.style.transform = `rotate(${-degrees}deg)`;
+            } else {
+                console.warn('No se encontró el leaflet-map-pane');
             }
         }
 
@@ -770,7 +780,8 @@
 
         function disableGPSView() {
             // Desactivar rotación y volver a norte arriba
-            const mapPane = map.getPane('mapPane');
+            const mapContainer = map.getContainer();
+            const mapPane = mapContainer.querySelector('.leaflet-map-pane');
             if (mapPane) {
                 mapPane.style.transform = 'rotate(0deg)';
             }
@@ -2362,9 +2373,11 @@
             if (lastPosition) {
                 heading = calculateBearing(lastPosition, userLatLng);
                 currentHeading = heading;
+                console.log('📍 Heading calculado:', heading.toFixed(2), '°');
             } else if (position.coords.heading !== null && position.coords.heading >= 0) {
                 heading = position.coords.heading;
                 currentHeading = heading;
+                console.log('📱 Heading del sensor:', heading.toFixed(2), '°');
             }
 
             // Actualizar marcador de vehículo con rotación
@@ -2374,10 +2387,12 @@
             }
 
             // CLAVE: Rotar el mapa para que el vehículo siempre apunte hacia arriba
+            console.log('🗺️ Aplicando rotación del mapa:', -heading.toFixed(2), '°');
             setMapRotation(heading);
 
             // Centrar mapa en la posición del usuario (cámara detrás del vehículo)
             map.setView(userLatLng, 16, { animate: true });
+
 
             // Calcular distancia y ETA al destino
             if (routeCoordinates.length > 0) {
