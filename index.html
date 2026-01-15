@@ -49,23 +49,21 @@
             top: 0;
             left: 0;
             z-index: 1;
+            perspective: 1000px;
+            overflow: hidden;
         }
 
-        /* Enable smooth map rotation */
-        .leaflet-map-pane {
-            transition: transform 0.5s ease-out;
-            transform-origin: center center;
-        }
+        /* Enable smooth map rotation and 3D tilt */
+        /* Eliminamos las transformaciones conflictivas en el pane interno */
 
-        #map.navigating .leaflet-map-pane {
-            will-change: transform;
-        }
 
 
         .leaflet-container {
             font-family: inherit;
             background: #1a1a2e !important;
         }
+
+
 
         .leaflet-tile-pane {
             z-index: 2 !important;
@@ -269,6 +267,8 @@
             font-size: 14px;
             transition: all 0.2s;
             -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
         }
 
         .search-input:focus {
@@ -756,37 +756,90 @@
         let currentHeading = 0;
         let lastHeading = 0;
         let mapRotation = 0;
+        let cumulativeRotation = 0; // Variable para rotación suave continuada
         let vehicleMarker = null;
         let billboardTimeout = null;
+        let navigationStartTime = 0; // Para el grace period
 
         // Funciones para rotación del mapa tipo GPS
         function setMapRotation(degrees) {
-            mapRotation = degrees;
-            // Obtener el contenedor interno de Leaflet que contiene todos los tiles y overlays
-            const mapContainer = map.getContainer();
-            const mapPane = mapContainer.querySelector('.leaflet-map-pane');
-            if (mapPane) {
-                // Rotar el mapa para que el vehículo siempre apunte hacia arriba
-                mapPane.style.transform = `rotate(${-degrees}deg)`;
-            } else {
-                console.warn('No se encontró el leaflet-map-pane');
-            }
+
+            // SMART ROTATION: Evitar giro de 360 grados al cruzar el norte (359 -> 0)
+            let delta = degrees - lastHeading;
+
+            // Normalizar delta al camino más corto (-180 a 180)
+            // Ejemplo: De 350 a 10 deg. Delta = -340. Delta += 360 -> 20. Correcto.
+            while (delta < -180) delta += 360;
+            while (delta > 180) delta -= 360;
+
+            // Acumular rotación
+            cumulativeRotation += delta;
+            lastHeading = degrees;
+            mapRotation = degrees; // Guardar heading real
+
+            const mapDiv = document.getElementById('map');
+
+            // APLICAR TRANSFORMACIÓN AL CONTENEDOR DEL MAPA (NO AL PANE)
+            // Usamos cumulativeRotation en lugar de degrees absoluto para evitar saltos
+            mapDiv.style.transform = `perspective(1000px) rotateX(60deg) rotateZ(${-cumulativeRotation}deg) scale(1.5)`;
+        }
+
+        function calculateDestinationPoint(latlng, heading, distance) {
+            const R = 6371e3; // Radio de la Tierra en metros
+            const d = distance; // Distancia en metros
+            const brng = heading * Math.PI / 180; // Bearing en radianes
+            const lat1 = latlng.lat * Math.PI / 180;
+            const lon1 = latlng.lng * Math.PI / 180;
+
+            const lat2 = Math.asin(Math.sin(lat1) * Math.cos(d / R) +
+                Math.cos(lat1) * Math.sin(d / R) * Math.cos(brng));
+
+            const lon2 = lon1 + Math.atan2(Math.sin(brng) * Math.sin(d / R) * Math.cos(lat1),
+                Math.cos(d / R) - Math.sin(lat1) * Math.sin(lat2));
+
+            return L.latLng(lat2 * 180 / Math.PI, lon2 * 180 / Math.PI);
         }
 
         function enableGPSView() {
-            // Activar clase para transiciones suaves
-            document.getElementById('map').classList.add('navigating');
+            // Activar clase para transiciones
+            const mapDiv = document.getElementById('map');
+            mapDiv.classList.add('navigating');
+            mapDiv.style.transition = 'transform 0.5s cubic-bezier(0.1, 0, 0.3, 1)';
+
+            // CAMBIAR A MODO SATÉLITE AUTOMÁTICAMENTE PARA REALISMO 3D
+            if (mapLayers.satellite) {
+                // Remover capa actual
+                if (currentLayer && map.hasLayer(currentLayer)) {
+                    map.removeLayer(currentLayer);
+                }
+                // Añadir satélite
+                mapLayers.satellite.addTo(map);
+                document.getElementById('mapType').value = 'satellite';
+            }
         }
 
         function disableGPSView() {
             // Desactivar rotación y volver a norte arriba
-            const mapContainer = map.getContainer();
-            const mapPane = mapContainer.querySelector('.leaflet-map-pane');
-            if (mapPane) {
-                mapPane.style.transform = 'rotate(0deg)';
-            }
+            const mapDiv = document.getElementById('map');
+            mapDiv.style.transform = '';
+            mapDiv.classList.remove('navigating');
             mapRotation = 0;
-            document.getElementById('map').classList.remove('navigating');
+
+            // Volver a mapa CyclOSM (mejor para lectura 2D) o el previo
+            if (mapLayers.cyclosm) {
+                if (mapLayers.satellite && map.hasLayer(mapLayers.satellite)) {
+                    map.removeLayer(mapLayers.satellite);
+                }
+                currentLayer = mapLayers.cyclosm;
+                currentLayer.addTo(map);
+                document.getElementById('mapType').value = 'cyclosm';
+            }
+
+            // Resetear transición después
+            setTimeout(() => {
+                mapDiv.style.transition = '';
+                map.invalidateSize(); // Recolocar tiles
+            }, 600);
         }
 
         // Función para calcular el bearing entre dos puntos
@@ -1195,6 +1248,68 @@
         let currentRouteIndex = 0;
         let lastRouteRequest = null;
 
+        // ==========================================
+        // AUTO-DEMO ROUTE (FALLBACK)
+        // ==========================================
+        function generateDemoRoute(startCoords, endCoords) {
+            console.log('⚠️ Generando ruta de demostración (Fallback)');
+
+            // Generar puntos intermedios para hacer una curva
+            const lat1 = startCoords.lat;
+            const lng1 = startCoords.lng;
+            const lat2 = endCoords.lat;
+            const lng2 = endCoords.lng;
+
+            const midLat = (lat1 + lat2) / 2;
+            const midLng = (lng1 + lng2) / 2;
+
+            // Crear una curva añadiendo offset
+            const curveOffset = 0.005; // ~500m
+
+            const demoCoordinates = [
+                [lat1, lng1],
+                [midLat + curveOffset, midLng - curveOffset], // Punto intermedio 1
+                [midLat - curveOffset, midLng + curveOffset], // Punto intermedio 2
+                [lat2, lng2]
+            ];
+
+            // Interpolación simple para tener más puntos
+            const detailedCoords = [];
+            for (let i = 0; i < demoCoordinates.length - 1; i++) {
+                const current = demoCoordinates[i];
+                const next = demoCoordinates[i + 1];
+                const steps = 20; // Puntos por segmento
+
+                for (let j = 0; j < steps; j++) {
+                    const t = j / steps;
+                    const lat = current[0] + (next[0] - current[0]) * t;
+                    const lng = current[1] + (next[1] - current[1]) * t;
+                    detailedCoords.push([lat, lng]);
+                }
+            }
+            detailedCoords.push([lat2, lng2]); // Añadir punto final
+
+            // Estructura de ruta simulada
+            const demoRoute = {
+                geometry: {
+                    coordinates: detailedCoords.map(c => [c[1], c[0]]), // GeoJSON [lng, lat]
+                    type: "LineString"
+                },
+                distance: 2500, // 2.5 km ficticios
+                duration: 300,  // 5 min
+                profile: 'demo-fallback',
+                legs: [{
+                    steps: generateStepsFromCoords(detailedCoords.map(c => [c[1], c[0]]), [])
+                }]
+            };
+
+            allRoutes = [demoRoute];
+            displayRoute(demoRoute, 1, 1);
+
+            showNotification('⚠️ Modo Local/Offline: Ruta DEMO generada');
+            document.getElementById('loading').classList.add('hidden');
+        }
+
         // Calculate route
         async function calculateRoute() {
             if (!markerA || !markerB) {
@@ -1239,8 +1354,15 @@
                     await calculateMixedRoute(startCoords, endCoords);
                 }
             } catch (error) {
-                console.error('Error:', error);
-                showNotification('⚠️ Error al calcular ruta. Inténtalo de nuevo.');
+                console.error('Error al calcular ruta:', error);
+
+                // FALLBACK AUTOMÁTICO PARA PRUEBAS LOCALES
+                if (window.location.protocol === 'file:' || error.message.includes('Failed to fetch') || error.name === 'TypeError') {
+                    console.warn('⚠️ Fallo en API, activando modo DEMO local');
+                    generateDemoRoute(startCoords, endCoords);
+                } else {
+                    showNotification('⚠️ Error al calcular ruta. Inténtalo de nuevo.');
+                }
             }
 
             document.getElementById('loading').classList.add('hidden');
@@ -2309,6 +2431,9 @@
         // NAVEGACIÓN GPS CON ROTACIÓN
         // ==========================================
 
+        let testRotationInterval = null;
+        let testHeading = 0;
+
         function startNavigation() {
             if (routeCoordinates.length === 0) {
                 showNotification('⚠️ Primero calcula una ruta');
@@ -2349,11 +2474,32 @@
                 );
             }
 
+            // MODO PRUEBA: Simular rotación para testing (solo si no hay movimiento real)
+            // Esto rotará automáticamente el mapa para que veas cómo funciona
+            setTimeout(() => {
+                if (currentHeading === 0) {
+                    console.log('🔄 Iniciando rotación de prueba (sin movimiento GPS detectado)');
+                    testRotationInterval = setInterval(() => {
+                        testHeading = (testHeading + 5) % 360;
+                        currentHeading = testHeading;
+                        setMapRotation(testHeading);
+                        if (vehicleMarker) {
+                            vehicleMarker.setIcon(createVehicleIcon(testHeading));
+                        }
+                        console.log('🧪 Test heading:', testHeading, '°');
+                    }, 1000);
+                }
+            }, 3000); // Esperar 3 segundos antes de iniciar rotación de prueba
+
             // Wake lock para mantener pantalla encendida
             requestWakeLock();
 
+            // GRACE PERIOD: Evitar que se detecte "llegada" inmediatamente si el GPS salta
+            navigationStartTime = Date.now();
+
             showNotification('🧭 Navegación iniciada - GPS activado');
         }
+
 
         function updateNavigationPosition(position) {
             if (!isNavigating) return;
@@ -2374,11 +2520,26 @@
                 heading = calculateBearing(lastPosition, userLatLng);
                 currentHeading = heading;
                 console.log('📍 Heading calculado:', heading.toFixed(2), '°');
+
+                // Detener rotación de prueba si hay movimiento real
+                if (testRotationInterval) {
+                    clearInterval(testRotationInterval);
+                    testRotationInterval = null;
+                    console.log('✅ Movimiento GPS detectado - Deteniendo rotación de prueba');
+                }
             } else if (position.coords.heading !== null && position.coords.heading >= 0) {
                 heading = position.coords.heading;
                 currentHeading = heading;
                 console.log('📱 Heading del sensor:', heading.toFixed(2), '°');
+
+                // Detener rotación de prueba si hay brújula
+                if (testRotationInterval) {
+                    clearInterval(testRotationInterval);
+                    testRotationInterval = null;
+                    console.log('✅ Brújula detectada - Deteniendo rotación de prueba');
+                }
             }
+
 
             // Actualizar marcador de vehículo con rotación
             if (vehicleMarker) {
@@ -2390,8 +2551,12 @@
             console.log('🗺️ Aplicando rotación del mapa:', -heading.toFixed(2), '°');
             setMapRotation(heading);
 
-            // Centrar mapa en la posición del usuario (cámara detrás del vehículo)
-            map.setView(userLatLng, 16, { animate: true });
+            // Centrar mapa ADELANTE de la posición del usuario para ver más carretera
+            // Offset de 250 metros en la dirección del movimiento
+            const offsetCenter = calculateDestinationPoint(userLatLng, heading, 250);
+
+            // Centrar mapa en el punto offset (cámara detrás del vehículo)
+            map.setView(offsetCenter, 17, { animate: true });
 
 
             // Calcular distancia y ETA al destino
@@ -2422,10 +2587,13 @@
                 });
 
                 // Verificar si ha llegado al destino
-                if (remainingDist < 20) {
+                // GRACE PERIOD: Esperar al menos 10 segundos antes de permitir "llegada"
+                const elapsed = Date.now() - navigationStartTime;
+
+                if (remainingDist < 30 && elapsed > 10000) {
                     speak('Has llegado a tu destino');
                     showNotification('🎉 ¡Has llegado!');
-                    stopNavigation();
+                    stopNavigation('destination_reached');
                 }
             }
 
@@ -2438,11 +2606,19 @@
             // Desactivar vista GPS y volver a norte arriba
             disableGPSView();
 
+            // Detener rotación de prueba si está activa
+            if (testRotationInterval) {
+                clearInterval(testRotationInterval);
+                testRotationInterval = null;
+                testHeading = 0;
+            }
+
             // Detener seguimiento GPS
             if (watchId) {
                 navigator.geolocation.clearWatch(watchId);
                 watchId = null;
             }
+
 
             // Mostrar menú de planificación y ocultar UI de navegación
             document.getElementById('menuPanel').style.display = 'block';
@@ -2464,12 +2640,22 @@
         }
 
         function centerOnUser() {
+            let target = lastPosition;
+            let heading = currentHeading;
+
             if (vehicleMarker) {
-                map.setView(vehicleMarker.getLatLng(), 16);
-            } else if (lastPosition) {
-                map.setView(lastPosition, 16);
-            } else {
+                target = vehicleMarker.getLatLng();
+            } else if (!target) {
                 showNotification('📍 No hay ubicación GPS disponible');
+                return;
+            }
+
+            // Usar offset si estamos navegando
+            if (isNavigating) {
+                const offsetCenter = calculateDestinationPoint(target, heading, 250);
+                map.setView(offsetCenter, 17);
+            } else {
+                map.setView(target, 16);
             }
         }
 
