@@ -2457,6 +2457,12 @@
             document.getElementById('navMode').classList.remove('hidden');
             document.getElementById('fabContainer').style.display = 'none';
 
+            // Ocultar marcador de usuario (punto azul) para solo ver el vehículo
+            if (userMarker) {
+                map.removeLayer(userMarker);
+                userMarker = null;
+            }
+
             // Crear marcador de vehículo si no existe
             if (!vehicleMarker && routeCoordinates.length > 0) {
                 const startPos = L.latLng(routeCoordinates[0]);
@@ -2481,22 +2487,7 @@
                 );
             }
 
-            // MODO PRUEBA: Simular rotación para testing (solo si no hay movimiento real)
-            // Esto rotará automáticamente el mapa para que veas cómo funciona
-            setTimeout(() => {
-                if (currentHeading === 0) {
-                    console.log('🔄 Iniciando rotación de prueba (sin movimiento GPS detectado)');
-                    testRotationInterval = setInterval(() => {
-                        testHeading = (testHeading + 5) % 360;
-                        currentHeading = testHeading;
-                        setMapRotation(testHeading);
-                        if (vehicleMarker) {
-                            vehicleMarker.setIcon(createVehicleIcon(testHeading));
-                        }
-                        console.log('🧪 Test heading:', testHeading, '°');
-                    }, 1000);
-                }
-            }, 3000); // Esperar 3 segundos antes de iniciar rotación de prueba
+
 
             // Wake lock para mantener pantalla encendida
             requestWakeLock();
@@ -2559,8 +2550,8 @@
             setMapRotation(heading);
 
             // Centrar mapa ADELANTE de la posición del usuario para ver más carretera
-            // Offset de 250 metros en la dirección del movimiento
-            const offsetCenter = calculateDestinationPoint(userLatLng, heading, 250);
+            // Offset reducido a 150m (Waze style) para que el vehículo no quede tan abajo con el scale 1.5
+            const offsetCenter = calculateDestinationPoint(userLatLng, heading, 150);
 
             // Centrar mapa en el punto offset (cámara detrás del vehículo)
             map.setView(offsetCenter, 17, { animate: true });
@@ -2659,7 +2650,7 @@
 
             // Usar offset si estamos navegando
             if (isNavigating) {
-                const offsetCenter = calculateDestinationPoint(target, heading, 250);
+                const offsetCenter = calculateDestinationPoint(target, heading, 150);
                 map.setView(offsetCenter, 17);
             } else {
                 map.setView(target, 16);
