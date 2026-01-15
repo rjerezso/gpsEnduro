@@ -50,7 +50,11 @@
             left: 0;
             z-index: 1;
             perspective: 1000px;
+            -webkit-perspective: 1000px;
             overflow: hidden;
+            /* Fix iOS rendering */
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
         }
 
         /* Enable smooth map rotation and 3D tilt */
@@ -781,7 +785,10 @@
 
             // APLICAR TRANSFORMACIÓN AL CONTENEDOR DEL MAPA (NO AL PANE)
             // Usamos cumulativeRotation en lugar de degrees absoluto para evitar saltos
-            mapDiv.style.transform = `perspective(1000px) rotateX(60deg) rotateZ(${-cumulativeRotation}deg) scale(1.5)`;
+            // Añadido soporte explícito para WebKit (iOS)
+            const transformString = `perspective(1000px) rotateX(60deg) rotateZ(${-cumulativeRotation}deg) scale(1.5)`;
+            mapDiv.style.webkitTransform = transformString;
+            mapDiv.style.transform = transformString;
         }
 
         function calculateDestinationPoint(latlng, heading, distance) {
