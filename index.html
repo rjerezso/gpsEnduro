@@ -51,6 +51,11 @@
             z-index: 1;
         }
 
+        /* Enable smooth map rotation */
+        #map.navigating .leaflet-map-pane {
+            transition: transform 0.5s ease-out;
+        }
+
         .leaflet-container {
             font-family: inherit;
             background: #1a1a2e !important;
@@ -115,63 +120,7 @@
             }
         }
 
-        /* Indicador de giro compacto - NO tapa el mapa */
-        .turn-billboard {
-            position: fixed;
-            top: 140px;
-            left: 50%;
-            transform: translateX(-50%) scale(0);
-            z-index: 2000;
-            background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
-            border-radius: 16px;
-            padding: 12px 24px;
-            text-align: center;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
-            transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
 
-        .turn-billboard.show {
-            transform: translateX(-50%) scale(1);
-        }
-
-        .turn-billboard .turn-arrow {
-            font-size: 36px;
-            color: white;
-            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-        }
-
-        .turn-billboard .turn-info {
-            text-align: left;
-        }
-
-        .turn-billboard .turn-text {
-            font-size: 16px;
-            font-weight: bold;
-            color: white;
-        }
-
-        .turn-billboard .turn-distance {
-            font-size: 24px;
-            font-weight: bold;
-            color: #fef3c7;
-        }
-
-        .turn-billboard .turn-street {
-            display: none;
-        }
-
-        @keyframes bounce-turn {
-            from {
-                transform: scale(1);
-            }
-
-            to {
-                transform: scale(1.1);
-            }
-        }
 
         /* MENÚ MÓVIL OPTIMIZADO - COMPACTO */
         .menu-panel {
@@ -227,20 +176,6 @@
             padding: 12px 16px;
             padding-bottom: max(16px, env(safe-area-inset-bottom));
             border-top: 2px solid #374151;
-        }
-
-        .turn-icon {
-            width: 56px;
-            height: 56px;
-            min-width: 56px;
-            background: linear-gradient(135deg, #f97316, #ea580c);
-            border-radius: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 26px;
-            color: white;
-            box-shadow: 0 4px 15px rgba(249, 115, 22, 0.4);
         }
 
         .speed-display {
@@ -639,17 +574,9 @@
     <div id="navMode" class="hidden">
         <!-- Top Navigation Panel -->
         <div class="nav-panel">
-            <div class="flex items-center gap-3">
-                <!-- Turn Indicator -->
-                <div class="turn-icon" id="turnIcon">
-                    <i class="fas fa-arrow-up"></i>
-                </div>
-
-                <!-- Turn Instructions -->
-                <div class="flex-1 min-w-0">
-                    <p class="text-2xl font-bold text-orange-400" id="turnDistance">--</p>
-                    <p class="text-white font-medium text-base truncate" id="turnInstruction">Calculando ruta...</p>
-                    <p class="text-sm text-gray-400 truncate" id="streetName">--</p>
+            <div class="flex items-center gap-3 justify-between">
+                <div class="flex-1">
+                    <p class="text-lg font-bold text-orange-400">Navegación activa</p>
                 </div>
 
                 <!-- Close Button -->
@@ -699,24 +626,6 @@
 
 
 
-            <!-- Alert Banner -->
-            <div id="alertBanner"
-                class="hidden mt-3 bg-gradient-to-r from-orange-600 to-amber-500 rounded-xl p-4 flex items-center gap-3 animate-pulse">
-                <i class="fas fa-exclamation-triangle text-2xl"></i>
-                <span class="font-bold text-base" id="alertText">¡Prepárate para girar!</span>
-            </div>
-
-        </div>
-    </div>
-
-    <!-- Indicador de giro compacto -->
-    <div id="turnBillboard" class="turn-billboard">
-        <div class="turn-arrow" id="billboardArrow">
-            <i class="fas fa-arrow-left"></i>
-        </div>
-        <div class="turn-info">
-            <div class="turn-distance" id="billboardDistance">50 m</div>
-            <div class="turn-text" id="billboardText">Gira a la izquierda</div>
         </div>
     </div>
 
@@ -843,6 +752,46 @@
         let mapRotation = 0;
         let vehicleMarker = null;
         let billboardTimeout = null;
+
+        // Funciones para rotación del mapa tipo GPS
+        function setMapRotation(degrees) {
+            mapRotation = degrees;
+            const mapPane = map.getPane('mapPane');
+            if (mapPane) {
+                // Rotar el mapa para que el vehículo siempre apunte hacia arriba
+                mapPane.style.transform = `rotate(${-degrees}deg)`;
+            }
+        }
+
+        function enableGPSView() {
+            // Activar clase para transiciones suaves
+            document.getElementById('map').classList.add('navigating');
+        }
+
+        function disableGPSView() {
+            // Desactivar rotación y volver a norte arriba
+            const mapPane = map.getPane('mapPane');
+            if (mapPane) {
+                mapPane.style.transform = 'rotate(0deg)';
+            }
+            mapRotation = 0;
+            document.getElementById('map').classList.remove('navigating');
+        }
+
+        // Función para calcular el bearing entre dos puntos
+        function calculateBearing(from, to) {
+            const lat1 = from.lat * Math.PI / 180;
+            const lat2 = to.lat * Math.PI / 180;
+            const dLon = (to.lng - from.lng) * Math.PI / 180;
+
+            const y = Math.sin(dLon) * Math.cos(lat2);
+            const x = Math.cos(lat1) * Math.sin(lat2) -
+                Math.sin(lat1) * Math.cos(lat2) * Math.cos(dLon);
+
+            const bearing = Math.atan2(y, x) * 180 / Math.PI;
+            return (bearing + 360) % 360; // Normalizar a 0-360
+        }
+
 
 
 
@@ -2344,6 +2293,180 @@
                 );
             }
         });
+
+        // ==========================================
+        // NAVEGACIÓN GPS CON ROTACIÓN
+        // ==========================================
+
+        function startNavigation() {
+            if (routeCoordinates.length === 0) {
+                showNotification('⚠️ Primero calcula una ruta');
+                return;
+            }
+
+            isNavigating = true;
+
+            // Activar vista GPS
+            enableGPSView();
+
+            // Ocultar menú de planificación y mostrar UI de navegación
+            document.getElementById('menuPanel').style.display = 'none';
+            document.getElementById('navMode').classList.remove('hidden');
+            document.getElementById('fabContainer').style.display = 'none';
+
+            // Crear marcador de vehículo si no existe
+            if (!vehicleMarker && routeCoordinates.length > 0) {
+                const startPos = L.latLng(routeCoordinates[0]);
+                vehicleMarker = L.marker(startPos, {
+                    icon: createVehicleIcon(0)
+                }).addTo(map);
+            }
+
+            // Iniciar seguimiento GPS
+            if ('geolocation' in navigator) {
+                watchId = navigator.geolocation.watchPosition(
+                    updateNavigationPosition,
+                    (error) => {
+                        console.error('GPS error:', error);
+                        showNotification('⚠️ Error al obtener ubicación GPS');
+                    },
+                    {
+                        enableHighAccuracy: true,
+                        maximumAge: 0,
+                        timeout: 5000
+                    }
+                );
+            }
+
+            // Wake lock para mantener pantalla encendida
+            requestWakeLock();
+
+            showNotification('🧭 Navegación iniciada - GPS activado');
+        }
+
+        function updateNavigationPosition(position) {
+            if (!isNavigating) return;
+
+            const lat = position.coords.latitude;
+            const lng = position.coords.longitude;
+            const userLatLng = L.latLng(lat, lng);
+
+            // Actualizar velocidad
+            if (position.coords.speed && position.coords.speed > 0) {
+                currentSpeed = Math.round(position.coords.speed * 3.6); // m/s a km/h
+            }
+            document.getElementById('currentSpeed').textContent = currentSpeed;
+
+            // Calcular heading basado en el movimiento
+            let heading = currentHeading;
+            if (lastPosition) {
+                heading = calculateBearing(lastPosition, userLatLng);
+                currentHeading = heading;
+            } else if (position.coords.heading !== null && position.coords.heading >= 0) {
+                heading = position.coords.heading;
+                currentHeading = heading;
+            }
+
+            // Actualizar marcador de vehículo con rotación
+            if (vehicleMarker) {
+                vehicleMarker.setLatLng(userLatLng);
+                vehicleMarker.setIcon(createVehicleIcon(heading));
+            }
+
+            // CLAVE: Rotar el mapa para que el vehículo siempre apunte hacia arriba
+            setMapRotation(heading);
+
+            // Centrar mapa en la posición del usuario (cámara detrás del vehículo)
+            map.setView(userLatLng, 16, { animate: true });
+
+            // Calcular distancia y ETA al destino
+            if (routeCoordinates.length > 0) {
+                const destLatLng = L.latLng(routeCoordinates[routeCoordinates.length - 1]);
+                const remainingDist = userLatLng.distanceTo(destLatLng);
+
+                // Actualizar distancia restante
+                if (remainingDist > 1000) {
+                    document.getElementById('navRemaining').textContent = (remainingDist / 1000).toFixed(1) + ' km';
+                } else {
+                    document.getElementById('navRemaining').textContent = Math.round(remainingDist) + ' m';
+                }
+
+                // Actualizar progreso
+                const startLatLng = L.latLng(routeCoordinates[0]);
+                const totalDist = startLatLng.distanceTo(destLatLng);
+                const progress = Math.max(0, Math.min(100, ((totalDist - remainingDist) / totalDist) * 100));
+                document.getElementById('progressFill').style.width = progress + '%';
+
+                // Calcular ETA
+                const avgSpeed = currentSpeed > 0 ? currentSpeed : 30; // km/h por defecto
+                const etaMinutes = Math.round((remainingDist / 1000) / avgSpeed * 60);
+                const etaTime = new Date(Date.now() + etaMinutes * 60000);
+                document.getElementById('navETA').textContent = etaTime.toLocaleTimeString('es-ES', {
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+
+                // Verificar si ha llegado al destino
+                if (remainingDist < 20) {
+                    speak('Has llegado a tu destino');
+                    showNotification('🎉 ¡Has llegado!');
+                    stopNavigation();
+                }
+            }
+
+            lastPosition = userLatLng;
+        }
+
+        function stopNavigation() {
+            isNavigating = false;
+
+            // Desactivar vista GPS y volver a norte arriba
+            disableGPSView();
+
+            // Detener seguimiento GPS
+            if (watchId) {
+                navigator.geolocation.clearWatch(watchId);
+                watchId = null;
+            }
+
+            // Mostrar menú de planificación y ocultar UI de navegación
+            document.getElementById('menuPanel').style.display = 'block';
+            document.getElementById('navMode').classList.add('hidden');
+            document.getElementById('fabContainer').style.display = 'flex';
+
+            // Remover marcador de vehículo
+            if (vehicleMarker) {
+                map.removeLayer(vehicleMarker);
+                vehicleMarker = null;
+            }
+
+            // Resetear variables
+            lastPosition = null;
+            currentSpeed = 0;
+            currentHeading = 0;
+
+            showNotification('⏹️ Navegación detenida');
+        }
+
+        function centerOnUser() {
+            if (vehicleMarker) {
+                map.setView(vehicleMarker.getLatLng(), 16);
+            } else if (lastPosition) {
+                map.setView(lastPosition, 16);
+            } else {
+                showNotification('📍 No hay ubicación GPS disponible');
+            }
+        }
+
+        // Función de síntesis de voz para notificaciones
+        function speak(text) {
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'es-ES';
+                utterance.rate = 1.0;
+                speechSynthesis.speak(utterance);
+            }
+        }
 
         // Initialize
         updateButtonStyles();
