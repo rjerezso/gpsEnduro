@@ -1555,8 +1555,8 @@ function getInstructionText(type, modifier) {
 function handleLocationError(error) {
     console.error('Location error:', error);
     showNotification('⚠️ Error de GPS. Verifica los permisos de ubicación.');
-    document.getElementById('turnInstruction').textContent = 'Esperando señal GPS...';
-    document.getElementById('turnDistance').textContent = '--';
+    safeSetText('turnInstruction', 'Esperando señal GPS...');
+    safeSetText('turnDistance', '--');
 
     // Reintentar obtener ubicación cada 5 segundos
     setTimeout(() => {
@@ -1639,9 +1639,9 @@ function centerOnUser() {
 function updateNavigationUI() {
     if (routeSteps && routeSteps.length > 0) {
         const firstStep = routeSteps[0];
-        document.getElementById('turnInstruction').textContent = 'Inicia el recorrido';
-        document.getElementById('streetName').textContent = firstStep.name || 'Ruta off-road';
-        document.getElementById('navRemaining').textContent = `${(totalDistance / 1000).toFixed(1)} km`;
+        safeSetText('turnInstruction', 'Inicia el recorrido');
+        safeSetText('streetName', firstStep.name || 'Ruta off-road');
+        safeSetText('navRemaining', `${(totalDistance / 1000).toFixed(1)} km`);
     }
 }
 
