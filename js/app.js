@@ -599,6 +599,12 @@ async function reverseGeocode(latlng, point) {
     }
 }
 
+// Helper seguro para actualizar texto
+function safeSetText(id, text) {
+    const el = document.getElementById(id);
+    if (el) el.textContent = text;
+}
+
 // Debug Logger
 let debugConsole = null;
 
@@ -638,11 +644,11 @@ async function calculateRoute() {
 
     // Actualizar texto de carga según modo
     if (routeType === 'offroad') {
-        document.getElementById('loadingText').textContent = 'Buscando caminos de tierra...';
-        document.getElementById('loadingSubtext').textContent = 'Usando BRouter MTB - Evita asfalto';
+        safeSetText('loadingText', 'Buscando caminos de tierra...');
+        safeSetText('loadingSubtext', 'Usando BRouter MTB - Evita asfalto');
     } else {
-        document.getElementById('loadingText').textContent = 'Calculando ruta mixta...';
-        document.getElementById('loadingSubtext').textContent = 'Puede incluir carreteras asfaltadas';
+        safeSetText('loadingText', 'Calculando ruta mixta...');
+        safeSetText('loadingSubtext', 'Puede incluir carreteras asfaltadas');
     }
 
     const startCoords = markerA.getLatLng();
@@ -1003,22 +1009,24 @@ function displayRoute(route, index, total) {
         elevation = Math.round(parseFloat(distance) * 15); // Estimación
     }
 
-    document.getElementById('distance').textContent = `${distance} km`;
+    safeSetText('distance', `${distance} km`);
 
     // Formatear duración: si es >= 60 min, mostrar en horas
     if (duration >= 60) {
         const hours = Math.floor(duration / 60);
         const mins = duration % 60;
         if (mins === 0) {
-            document.getElementById('duration').textContent = hours + 'h';
+            safeSetText('duration', hours + 'h');
         } else {
-            document.getElementById('duration').textContent = hours + 'h ' + mins + 'm';
+            safeSetText('duration', hours + 'h ' + mins + 'm');
         }
     } else {
-        document.getElementById('duration').textContent = duration + ' min';
+        safeSetText('duration', duration + ' min');
     }
-    document.getElementById('elevation').textContent = `↑${elevation} m`;
-    document.getElementById('routeInfo').classList.remove('hidden');
+    safeSetText('elevation', `↑${elevation} m`);
+
+    const infoPanel = document.getElementById('routeInfo');
+    if (infoPanel) infoPanel.classList.remove('hidden');
 
     // Mostrar el tipo de ruta
     const profileText = route.profile ? ` (${route.profile})` : '';
