@@ -683,8 +683,8 @@ async function calculateRoute() {
 
 // Calcular ruta OFF-ROAD usando BRouter (evita asfalto)
 async function calculateOffroadRoute(startCoords, endCoords) {
-    // BRouter profiles para off-road: mtb, trekking, hiking
-    const profiles = ['mtb', 'trekking', 'hiking'];
+    // BRouter profiles para off-road: mtb, trekking (Hiking returns 500 errors and is less relevant for Enduro)
+    const profiles = ['mtb', 'trekking'];
 
     // Format coordinates to avoid long decimals (cause of some 500 errors)
     const startLng = parseFloat(startCoords.lng).toFixed(6);
@@ -726,6 +726,10 @@ async function calculateOffroadRoute(startCoords, endCoords) {
                     };
 
                     allRoutes.push(route);
+
+                    // Si encontramos una ruta válida, terminamos para ser más rápidos
+                    addDebugLog(`Route found with ${profile}, stopping search.`);
+                    break;
                 }
             }
         } catch (e) {
