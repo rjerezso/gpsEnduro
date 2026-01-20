@@ -2596,6 +2596,208 @@
             }
 
             lastPosition = userLatLng;
+
+            // CHECK DEVIATION (Recalculate check)
+            checkRouteDeviation(userLatLng);
+        }
+
+        // ==========================================
+        // RECALCULATION LOGIC
+        // ==========================================
+
+        let lastRecalculationTime = 0;
+        const RECALC_COOLDOWN = 10000; // 10 seconds
+        const MAX_OFF_ROUTE_DISTANCE = 50; // 50 meters
+
+        function checkRouteDeviation(userLatLng) {
+            // No recalcular si acabamos de hacerlo o si no hay ruta
+            if (Date.now() - lastRecalculationTime < RECALC_COOLDOWN) return;
+            if (!routeCoordinates || routeCoordinates.length < 2) return;
+
+            // Calcular distancia mínima a la ruta actual
+            const minDistance = getDistanceFromRoute(userLatLng, routeCoordinates);
+
+            // Debug info
+            // console.log(`📏 Distancia a ruta: ${minDistance.toFixed(1)}m`);
+
+            if (minDistance > MAX_OFF_ROUTE_DISTANCE) {
+                console.warn(`⚠️ DESVÍO DETECTADO: ${minDistance.toFixed(1)}m > ${MAX_OFF_ROUTE_DISTANCE}m`);
+                recalculateRoute(userLatLng);
+            }
+        }
+
+        function getDistanceFromRoute(point, coords) {
+            let minD = Infinity;
+
+            for (let i = 0; i < coords.length - 1; i++) {
+                const p1 = L.latLng(coords[i][0], coords[i][1]);
+                const p2 = L.latLng(coords[i + 1][0], coords[i + 1][1]);
+
+                const d = getDistanceFromLine(point, p1, p2);
+                if (d < minD) minD = d;
+            }
+            return minD;
+        }
+
+        // Distancia de punto P a segmento AB
+        function getDistanceFromLine(p, a, b) {
+            const latA = a.lat, lngA = a.lng;
+            const latB = b.lat, lngB = b.lng;
+            const latP = p.lat, lngP = p.lng;
+
+            const A = latP - latA;
+            const B = lngP - lngA;
+            const C = latB - latA;
+            const D = lngB - lngA;
+
+            const dot = A * C + B * D;
+            const len_sq = C * C + D * D;
+            let param = -1;
+
+            if (len_sq !== 0) // in case of 0 length line
+                param = dot / len_sq;
+
+            let xx, yy;
+
+            if (param < 0) {
+                xx = latA;
+                yy = lngA;
+            } else if (param > 1) {
+                xx = latB;
+                yy = lngB;
+            } else {
+                xx = latA + param * C;
+                yy = lngA + param * D;
+            }
+
+            const dx = latP - xx;
+            const dy = lngP - yy;
+
+            // Aproximación rápida en metros (1 grado lat ~ 111km)
+            // Para mayor precisión usar distancias geodésicas, pero esto es suficiente para detección de desvío
+            const distDeg = Math.sqrt(dx * dx + dy * dy);
+            return distDeg * 111000;
+        }
+
+        async function recalculateRoute(userLatLng) {
+            lastRecalculationTime = Date.now();
+            showNotification('🔄 Recalculando ruta...');
+            document.getElementById('turnInstruction').textContent = 'Recalculando...';
+
+            if (!markerB) return; // No hay destino
+
+            const endCoords = markerB.getLatLng();
+
+            try {
+                // Actualizar Start Point visualmente (aunque no se vea en Nav mode)
+                if (markerA) {
+                    markerA.setLatLng(userLatLng);
+                    searchInputA.value = '📍 Tu ubicación actual';
+                }
+
+                // Llamar a las funciones de cálculo existentes
+                // Nota: calculateOffroadRoute/MixedRoute usan markerA global, así que aseguramos que esté actualizado
+                if (!markerA) {
+                    markerA = L.marker(userLatLng).addTo(map);
+                } else {
+                    markerA.setLatLng(userLatLng);
+                }
+
+                allRoutes = [];
+
+                if (routeType === 'offroad') {
+                    await calculateOffroadRoute(userLatLng, endCoords);
+                } else {
+                    await calculateMixedRoute(userLatLng, endCoords);
+                }
+
+                // updateNavigationPosition se encargará de actualizar la UI de navegación
+                // cuando se mueva la posición de nuevo, pero necesitamos resetear el step index
+                currentStepIndex = 0;
+
+                // Forzar actualización inmediata de pasos
+                if (allRoutes.length > 0) {
+                    showNotification('✅ Ruta actualizada');
+                    // Actualizar info visual
+                    const newRoute = allRoutes[0];
+                    routeCoordinates = newRoute.geometry.coordinates.map(c => [c[1], c[0]]);
+                    routeSteps = newRoute.legs ? newRoute.legs[0].steps : [];
+                    totalDistance = newRoute.distance;
+
+                    updateNavigationUI();
+                }
+
+            } catch (error) {
+                console.error('Error recalculando:', error);
+                showNotification('❌ Error al recalcular');
+            }
+        }
+
+        // ==========================================
+        // MAP ROTATION & VIEW HELPERS
+        // ==========================================
+
+        function enableGPSView() {
+            const mapContainer = document.getElementById('map');
+            mapContainer.classList.add('navigation-mode');
+            // Desactivar interacciones para evitar conflictos con la rotación CSS
+            map.dragging.disable();
+            map.touchZoom.disable();
+            map.doubleClickZoom.disable();
+            map.scrollWheelZoom.disable();
+            map.boxZoom.disable();
+            map.keyboard.disable();
+            if (map.tap) map.tap.disable();
+        }
+
+        function disableGPSView() {
+            const mapContainer = document.getElementById('map');
+            mapContainer.classList.remove('navigation-mode');
+            mapContainer.style.transform = '';
+
+            // Reactivar interacciones
+            map.dragging.enable();
+            map.touchZoom.enable();
+            map.doubleClickZoom.enable();
+            map.scrollWheelZoom.enable();
+            map.boxZoom.enable();
+            map.keyboard.enable();
+            if (map.tap) map.tap.enable();
+
+            // Reset rotation
+            if (map.getPane('mapPane')) map.getPane('mapPane').style.transform = '';
+        }
+
+        function setMapRotation(heading) {
+            const mapContainer = document.getElementById('map');
+
+            // Aplicar rotación al contenedor principal
+            // Usamos translateZ(0) para forzar aceleración de hardware
+            mapContainer.style.transform = `rotate(${-heading}deg) translateZ(0)`;
+
+            // OPCIONAL: Contra-rotar iconos (puede ser costoso en rendimiento)
+            // Solo lo hacemos para marcadores de inicio/fin si existen
+            if (markerA && markerA._icon) {
+                markerA._icon.style.transform = markerA._icon.style.transform.replace(/rotate\([^)]*\)/g, '') + ` rotate(${heading}deg)`;
+            }
+            if (markerB && markerB._icon) {
+                markerB._icon.style.transform = markerB._icon.style.transform.replace(/rotate\([^)]*\)/g, '') + ` rotate(${heading}deg)`;
+            }
+        }
+
+        function calculateDestinationPoint(start, bearing, distance) {
+            const R = 6371e3; // Radio tierra metros
+            const d = distance;
+            const brng = bearing * Math.PI / 180;
+            const lat1 = start.lat * Math.PI / 180;
+            const lon1 = start.lng * Math.PI / 180;
+
+            const lat2 = Math.asin(Math.sin(lat1) * Math.cos(d / R) +
+                Math.cos(lat1) * Math.sin(d / R) * Math.cos(brng));
+            const lon2 = lon1 + Math.atan2(Math.sin(brng) * Math.sin(d / R) * Math.cos(lat1),
+                Math.cos(d / R) - Math.sin(lat1) * Math.sin(lat2));
+
+            return L.latLng(lat2 * 180 / Math.PI, lon2 * 180 / Math.PI);
         }
 
         function stopNavigation() {
