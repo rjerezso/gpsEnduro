@@ -605,6 +605,18 @@ function safeSetText(id, text) {
     if (el) el.textContent = text;
 }
 
+// Helper seguro para actualizar HTML
+function safeSetHTML(id, html) {
+    const el = document.getElementById(id);
+    if (el) el.innerHTML = html;
+}
+
+// Helper seguro para actualizar estilos
+function safeSetStyle(id, property, value) {
+    const el = document.getElementById(id);
+    if (el) el.style[property] = value;
+}
+
 // Debug Logger
 let debugConsole = null;
 
@@ -1093,11 +1105,11 @@ function startNavigation() {
         );
 
         showNotification('🧭 Navegación iniciada - Esperando GPS...');
-        document.getElementById('turnInstruction').textContent = 'Esperando señal GPS...';
-        document.getElementById('turnDistance').textContent = 'Activa tu GPS';
+        safeSetText('turnInstruction', 'Esperando señal GPS...');
+        safeSetText('turnDistance', 'Activa tu GPS');
     } else {
         showNotification('⚠️ Geolocalización no disponible en este dispositivo');
-        document.getElementById('turnInstruction').textContent = 'GPS no disponible';
+        safeSetText('turnInstruction', 'GPS no disponible');
     }
 
     // Activar wake lock para mantener pantalla encendida
@@ -1151,7 +1163,7 @@ function updateNavigation(position) {
 
     // Update speed
     currentSpeed = speed ? Math.round(speed * 3.6) : 0;
-    document.getElementById('currentSpeed').textContent = currentSpeed;
+    safeSetText('currentSpeed', currentSpeed);
 
     // Calcular heading si no está disponible
     const userLatLng = L.latLng(lat, lng);
@@ -1198,22 +1210,22 @@ function updateNavigation(position) {
 
     // Update remaining distance
     if (remainingDist > 1000) {
-        document.getElementById('navRemaining').textContent = `${(remainingDist / 1000).toFixed(1)} km`;
+        safeSetText('navRemaining', `${(remainingDist / 1000).toFixed(1)} km`);
     } else {
-        document.getElementById('navRemaining').textContent = `${Math.round(remainingDist)} m`;
+        safeSetText('navRemaining', `${Math.round(remainingDist)} m`);
     }
 
     // Calculate progress
     const startLatLng = L.latLng(routeCoordinates[0]);
     const totalDist = startLatLng.distanceTo(destLatLng);
     const progress = Math.max(0, Math.min(100, ((totalDist - remainingDist) / totalDist) * 100));
-    document.getElementById('progressFill').style.width = `${progress}%`;
+    safeSetStyle('progressFill', 'width', `${progress}%`);
 
     // Calculate ETA
     const avgSpeed = currentSpeed > 5 ? currentSpeed : 30; // Default 30 km/h
     const etaMinutes = Math.round((remainingDist / 1000) / avgSpeed * 60);
     const etaTime = new Date(Date.now() + etaMinutes * 60000);
-    document.getElementById('navETA').textContent = etaTime.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+    safeSetText('navETA', etaTime.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }));
 
     // Find current step
     updateCurrentStep(userLatLng);
@@ -1268,19 +1280,19 @@ function updateCurrentStep(userLatLng) {
 
     // Get turn icon
     const turnIcon = getTurnIcon(turnType, modifier);
-    document.getElementById('turnIcon').innerHTML = '<i class="fas ' + turnIcon + '"></i>';
+    safeSetHTML('turnIcon', '<i class="fas ' + turnIcon + '"></i>');
 
     // Distance to next maneuver
     if (minDist > 1000) {
-        document.getElementById('turnDistance').textContent = (minDist / 1000).toFixed(1) + ' km';
+        safeSetText('turnDistance', (minDist / 1000).toFixed(1) + ' km');
     } else {
-        document.getElementById('turnDistance').textContent = Math.round(minDist) + ' m';
+        safeSetText('turnDistance', Math.round(minDist) + ' m');
     }
 
     // Instruction text
     const instruction = getInstructionText(turnType, modifier);
-    document.getElementById('turnInstruction').textContent = instruction;
-    document.getElementById('streetName').textContent = currentStep.name || 'Camino sin nombre';
+    safeSetText('turnInstruction', instruction);
+    safeSetText('streetName', currentStep.name || 'Camino sin nombre');
 
     // Referencias a elementos
     const alertBanner = document.getElementById('alertBanner');
@@ -1298,7 +1310,7 @@ function updateCurrentStep(userLatLng) {
             if (minDist < 100) {
                 alertBanner.classList.remove('hidden');
                 const dir = isLeft ? 'izquierda' : 'derecha';
-                document.getElementById('alertText').textContent = '¡Gira a la ' + dir + ' en ' + Math.round(minDist) + 'm!';
+                safeSetText('alertText', '¡Gira a la ' + dir + ' en ' + Math.round(minDist) + 'm!');
             } else {
                 alertBanner.classList.add('hidden');
             }
@@ -1332,17 +1344,19 @@ function showTurnBillboard(turnType, modifier, distance, streetName) {
 
     // Determinar icono y texto
     if (isLeft) {
-        arrow.innerHTML = '<i class="fas fa-arrow-left"></i>';
-        text.textContent = 'Gira a la izquierda';
+        if (arrow) arrow.innerHTML = '<i class="fas fa-arrow-left"></i>';
+        if (text) text.textContent = 'Gira a la izquierda';
     } else {
-        arrow.innerHTML = '<i class="fas fa-arrow-right"></i>';
-        text.textContent = 'Gira a la derecha';
+        if (arrow) arrow.innerHTML = '<i class="fas fa-arrow-right"></i>';
+        if (text) text.textContent = 'Gira a la derecha';
     }
 
-    if (distance > 1000) {
-        distEl.textContent = (distance / 1000).toFixed(1) + ' km';
-    } else {
-        distEl.textContent = Math.round(distance) + ' m';
+    if (distEl) {
+        if (distance > 1000) {
+            distEl.textContent = (distance / 1000).toFixed(1) + ' km';
+        } else {
+            distEl.textContent = Math.round(distance) + ' m';
+        }
     }
 
     billboard.classList.add('show');
