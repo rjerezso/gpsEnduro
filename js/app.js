@@ -686,10 +686,16 @@ async function calculateOffroadRoute(startCoords, endCoords) {
     // BRouter profiles para off-road: mtb, trekking, hiking
     const profiles = ['mtb', 'trekking', 'hiking'];
 
+    // Format coordinates to avoid long decimals (cause of some 500 errors)
+    const startLng = parseFloat(startCoords.lng).toFixed(6);
+    const startLat = parseFloat(startCoords.lat).toFixed(6);
+    const endLng = parseFloat(endCoords.lng).toFixed(6);
+    const endLat = parseFloat(endCoords.lat).toFixed(6);
+
     for (const profile of profiles) {
         try {
             // BRouter API
-            const brouterUrl = `https://brouter.de/brouter?lonlats=${startCoords.lng},${startCoords.lat}|${endCoords.lng},${endCoords.lat}&profile=${profile}&alternativeidx=0&format=geojson`;
+            const brouterUrl = `https://brouter.de/brouter?lonlats=${startLng},${startLat}|${endLng},${endLat}&profile=${profile}&alternativeidx=0&format=geojson`;
 
             addDebugLog(`BRouter Request (${profile}): ${brouterUrl}`);
 
@@ -743,6 +749,7 @@ async function calculateOffroadRoute(startCoords, endCoords) {
         showNotification(`🏔️ Ruta OFF-ROAD encontrada (${allRoutes[0].profile || 'mtb'})`);
     } else {
         // Fallback a OSRM si BRouter falla
+        addDebugLog('⚠️ BRouter failure - Falling back to Mixed Route (OSRM)');
         showNotification('⚠️ BRouter no disponible, usando ruta mixta...');
         await calculateMixedRoute(startCoords, endCoords);
     }
