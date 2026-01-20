@@ -599,6 +599,27 @@ async function reverseGeocode(latlng, point) {
     }
 }
 
+// Debug Logger
+let debugConsole = null;
+
+function createDebugConsole() {
+    debugConsole = document.createElement('div');
+    debugConsole.id = 'debugConsole';
+    debugConsole.style.cssText = 'position:fixed;bottom:0;left:0;right:0;height:150px;background:rgba(0,0,0,0.85);color:#0f0;font-family:monospace;font-size:10px;overflow-y:scroll;z-index:9999;padding:5px;pointer-events:none;border-top:1px solid #0f0;';
+    document.body.appendChild(debugConsole);
+    addDebugLog('Debug console initialized');
+}
+
+function addDebugLog(msg) {
+    if (!debugConsole) createDebugConsole();
+    const line = document.createElement('div');
+    const time = new Date().toLocaleTimeString();
+    line.textContent = `[${time}] ${typeof msg === 'object' ? JSON.stringify(msg) : msg}`;
+    debugConsole.appendChild(line);
+    debugConsole.scrollTop = debugConsole.scrollHeight;
+    console.log(msg);
+}
+
 // Variables para rutas alternativas
 let allRoutes = [];
 let currentRouteIndex = 0;
@@ -644,9 +665,11 @@ async function calculateRoute() {
     try {
         if (routeType === 'offroad') {
             // Usar BRouter con perfil MTB para evitar asfalto
+            addDebugLog(`Calculating Offroad Route: ${startCoords.lat},${startCoords.lng} -> ${endCoords.lat},${endCoords.lng}`);
             await calculateOffroadRoute(startCoords, endCoords);
         } else {
             // Modo mixto: usar OSRM normal
+            addDebugLog(`Calculating Mixed Route: ${startCoords.lat},${startCoords.lng} -> ${endCoords.lat},${endCoords.lng}`);
             await calculateMixedRoute(startCoords, endCoords);
         }
     } catch (error) {
@@ -668,10 +691,15 @@ async function calculateOffroadRoute(startCoords, endCoords) {
             // BRouter API
             const brouterUrl = `https://brouter.de/brouter?lonlats=${startCoords.lng},${startCoords.lat}|${endCoords.lng},${endCoords.lat}&profile=${profile}&alternativeidx=0&format=geojson`;
 
+            addDebugLog(`BRouter Request (${profile}): ${brouterUrl}`);
+
             const response = await fetch(brouterUrl);
+
+            addDebugLog(`BRouter Response (${profile}): ${response.status} ${response.statusText}`);
 
             if (response.ok) {
                 const data = await response.json();
+                addDebugLog(`BRouter Data features: ${data.features ? data.features.length : 0}`);
 
                 if (data.features && data.features.length > 0) {
                     const feature = data.features[0];
@@ -696,6 +724,7 @@ async function calculateOffroadRoute(startCoords, endCoords) {
             }
         } catch (e) {
             console.log(`Error con perfil ${profile}:`, e);
+            addDebugLog(`BRouter Error (${profile}): ${e.message}`);
         }
     }
 
@@ -847,6 +876,7 @@ async function generateOffroadAlternatives(start, end) {
 
 // Calcular ruta MIXTA usando OSRM
 async function calculateMixedRoute(startCoords, endCoords) {
+    addDebugLog(`Mixed Route Request: ${startCoords.lat},${startCoords.lng} -> ${endCoords.lat},${endCoords.lng}`);
     const response = await fetch(
         `https://router.project-osrm.org/route/v1/driving/${startCoords.lng},${startCoords.lat};${endCoords.lng},${endCoords.lat}?overview=full&geometries=geojson&steps=true&alternatives=3`
     );
@@ -1364,6 +1394,7 @@ function checkOffRoute(userLatLng) {
 }
 
 async function recalculateRoute(userLatLng) {
+    addDebugLog(`Recalculating from: ${userLatLng.lat}, ${userLatLng.lng}`);
     if (!markerB) return;
 
     // Actualizar punto A (origen) a la posición actual
@@ -1392,6 +1423,7 @@ async function recalculateRoute(userLatLng) {
         }
     } catch (error) {
         console.error("Error recalculando ruta:", error);
+        addDebugLog(`RECALC ERROR: ${error.message}`);
         showNotification("❌ Error al recalcular ruta");
     }
 }
@@ -1938,6 +1970,8 @@ window.addEventListener('beforeinstallprompt', (e) => {
     deferredPrompt = e;
     // Could show an install button here
 });
+
+document.addEventListener('DOMContentLoaded', createDebugConsole);
 
 // Wake lock to keep screen on during navigation
 async function requestWakeLock() {
